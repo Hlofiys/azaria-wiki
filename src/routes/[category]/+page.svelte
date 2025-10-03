@@ -125,8 +125,9 @@
 				
 				<!-- Sort -->
 				<div class="flex items-center space-x-2">
-					<label class="text-azaria-text font-body">Сортировка:</label>
+					<label for="sort-select" class="text-azaria-text font-body">Сортировка:</label>
 					<select 
+						id="sort-select"
 						bind:value={sortBy} 
 						class="px-3 py-2 rounded-lg border transition-colors duration-300"
 						style="
