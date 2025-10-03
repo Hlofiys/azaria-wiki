@@ -40,6 +40,9 @@ COPY --from=builder /app/build /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Create simple nginx.conf to avoid PID issues
+RUN echo "events{} http{ include /etc/nginx/conf.d/*.conf; }" > /etc/nginx/nginx.conf
+
 # Expose port
 EXPOSE 8080
 
