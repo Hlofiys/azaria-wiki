@@ -22,6 +22,9 @@ RUN npm ci --ignore-scripts
 # Copy source code
 COPY . .
 
+# Sync SvelteKit first to generate .svelte-kit directory
+RUN npm run prepare
+
 # Build the application
 RUN npm run build
 
