@@ -16,8 +16,8 @@ RUN apk add --no-cache \
 COPY package*.json ./
 COPY bun.lock* ./
 
-# Install dependencies (prefer npm ci for production builds)
-RUN npm ci --only=production --ignore-scripts
+# Install all dependencies (needed for build)
+RUN npm ci --ignore-scripts
 
 # Copy source code
 COPY . .
@@ -34,73 +34,8 @@ RUN apk upgrade --no-cache
 # Copy built assets from builder stage
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Copy custom nginx configuration for SPA
-COPY <<EOF /etc/nginx/conf.d/default.conf
-server {
-    listen 80;
-    server_name _;
-    root /usr/share/nginx/html;
-    index index.html;
-
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # Gzip compression
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types
-        text/plain
-        text/css
-        text/xml
-        text/javascript
-        application/json
-        application/javascript
-        application/xml+rss
-        application/atom+xml
-        image/svg+xml;
-
-    # Cache static assets
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        add_header X-Content-Type-Options "nosniff";
-    }
-
-    # Handle SPA routing (fallback to index.html)
-    location / {
-        try_files $uri $uri/ /index.html;
-        add_header Cache-Control "no-cache, no-store, must-revalidate";
-        add_header Pragma "no-cache";
-        add_header Expires "0";
-    }
-
-    # Health check endpoint
-    location /health {
-        access_log off;
-        return 200 "healthy\n";
-        add_header Content-Type text/plain;
-    }
-
-    # Security: Hide nginx version
-    server_tokens off;
-
-    # Prevent access to hidden files
-    location ~ /\. {
-        deny all;
-        access_log off;
-        log_not_found off;
-    }
-}
-EOF
-
-# Update nginx config to run on port 8080 (non-privileged)
-RUN sed -i 's/listen 80;/listen 8080;/' /etc/nginx/conf.d/default.conf
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S azaria && \

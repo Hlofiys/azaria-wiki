@@ -32,8 +32,11 @@ dist/
 
 # Docker
 Dockerfile
+Dockerfile.dev
 .dockerignore
 docker-compose*.yml
+# Keep nginx.conf as it's needed for the build
+!nginx.conf
 
 # Environment files
 .env
