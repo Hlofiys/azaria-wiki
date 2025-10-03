@@ -1,0 +1,83 @@
+@import 'tailwindcss';
+
+/* Azaria Wiki Theme - Ultra Eye-Friendly */
+body {
+	background-color: #1a1a1a;
+	background-image: 
+		radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
+		radial-gradient(circle at 75% 75%, rgba(25, 25, 112, 0.02) 0%, transparent 50%);
+	color: #d0d0d0;
+	font-family: 'Lora', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: #c9a876;
+	font-family: 'Cinzel Decorative', serif;
+	text-shadow: 0 0 4px rgba(201, 168, 118, 0.2);
+}
+
+a {
+	color: #c9a876;
+	transition: all 0.3s ease;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #e6c190;
+	text-shadow: 0 0 3px rgba(230, 193, 144, 0.3);
+}
+
+.azaria-card {
+	background-color: #242424;
+	background-image: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
+	border: 1px solid rgba(201, 168, 118, 0.15);
+	border-radius: 0.5rem;
+	padding: 1.5rem;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.azaria-btn {
+	background: linear-gradient(145deg, #5a4a3a 0%, #6b5b4b 100%);
+	color: #d0d0d0;
+	border: 1px solid #5a4a3a;
+	padding: 0.75rem 1.5rem;
+	border-radius: 0.5rem;
+	font-weight: 600;
+	transition: all 0.3s ease;
+	text-decoration: none;
+	display: inline-block;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.azaria-btn:hover {
+	background: linear-gradient(145deg, #6b5b4b 0%, #7c6c5c 100%);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	color: #e0e0e0;
+}
+
+.azaria-input {
+	background-color: #1a1a1a;
+	color: #d0d0d0;
+	border: 1px solid rgba(201, 168, 118, 0.2);
+	border-radius: 0.5rem;
+	padding: 0.75rem;
+}
+
+.azaria-input:focus {
+	border-color: #c9a876;
+	outline: none;
+	box-shadow: 0 0 4px rgba(201, 168, 118, 0.2);
+}
+
+.loading-dice {
+	animation: roll 2s infinite;
+}
+
+@keyframes roll {
+	0% { transform: rotate(0deg); }
+	25% { transform: rotate(90deg); }
+	50% { transform: rotate(180deg); }
+	75% { transform: rotate(270deg); }
+	100% { transform: rotate(360deg); }
+}
