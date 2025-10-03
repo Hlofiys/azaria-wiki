@@ -1,5 +1,4 @@
 # Azaria Wiki - Docker Compose Configuration
-version: '3.8'
 
 services:
   azaria-wiki:
@@ -14,16 +13,6 @@ services:
     # Environment variables
     environment:
       - NODE_ENV=production
-    
-    # Resource limits
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
-        reservations:
-          memory: 128M
-          cpus: '0.25'
     
     # Health check
     healthcheck:
