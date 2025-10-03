@@ -1,11 +1,12 @@
 @import 'tailwindcss';
 
-/* Azaria Wiki Theme - Ultra Eye-Friendly */
+/* Azaria Wiki Theme - Enhanced Visual Interest */
 body {
 	background-color: #1a1a1a;
 	background-image: 
-		radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
-		radial-gradient(circle at 75% 75%, rgba(25, 25, 112, 0.02) 0%, transparent 50%);
+		radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.02) 0%, transparent 50%),
+		radial-gradient(circle at 75% 75%, rgba(175, 122, 197, 0.02) 0%, transparent 50%),
+		radial-gradient(circle at 50% 100%, rgba(93, 173, 226, 0.01) 0%, transparent 60%);
 	color: #d0d0d0;
 	font-family: 'Lora', serif;
 }
@@ -80,4 +81,84 @@ a:hover {
 	50% { transform: rotate(180deg); }
 	75% { transform: rotate(270deg); }
 	100% { transform: rotate(360deg); }
+}
+
+/* Enhanced visual effects */
+.category-glow {
+	transition: all 0.3s ease;
+}
+
+.category-glow:hover {
+	transform: translateY(-2px);
+	filter: brightness(1.1);
+}
+
+/* Subtle pulse animation for important elements */
+@keyframes subtle-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.8; }
+}
+
+.pulse-glow {
+	animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+/* Floating particles animation */
+@keyframes float {
+	0%, 100% { transform: translateY(0px) rotate(0deg); }
+	33% { transform: translateY(-10px) rotate(120deg); }
+	66% { transform: translateY(5px) rotate(240deg); }
+}
+
+.floating-particle {
+	animation: float 6s ease-in-out infinite;
+}
+
+/* Icon bounce animation */
+@keyframes icon-bounce {
+	0%, 100% { transform: scale(1); }
+	50% { transform: scale(1.1); }
+}
+
+.icon-bounce:hover {
+	animation: icon-bounce 0.6s ease-in-out;
+}
+
+/* Staggered fade-in animation */
+@keyframes fade-in-up {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.fade-in-up {
+	animation: fade-in-up 0.8s ease-out forwards;
+}
+
+/* Gentle glow animation */
+@keyframes gentle-glow {
+	0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
+	50% { filter: drop-shadow(0 0 15px currentColor); }
+}
+
+.gentle-glow {
+	animation: gentle-glow 4s ease-in-out infinite;
+}
+
+/* Category-specific glows */
+.glow-characters { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+.glow-locations { box-shadow: 0 0 20px rgba(93, 173, 226, 0.3); }
+.glow-factions { box-shadow: 0 0 20px rgba(231, 76, 60, 0.3); }
+.glow-artifacts { box-shadow: 0 0 20px rgba(175, 122, 197, 0.3); }
+.glow-concepts { box-shadow: 0 0 20px rgba(88, 214, 141, 0.3); }
+.glow-creatures { box-shadow: 0 0 20px rgba(243, 156, 18, 0.3); }
+
+/* Smooth transitions for all interactive elements */
+* {
+	transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }

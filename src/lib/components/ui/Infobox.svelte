@@ -1,27 +1,32 @@
 <script>
+	import { Icon, getCategoryIcon, getCategoryColors } from '$lib/icons.js';
+	
 	export let entry;
 	export let backlinks = [];
 	
-	// Get category icon
-	function getCategoryIcon(category) {
-		const icons = {
-			characters: '👑',
-			locations: '🏰',
-			factions: '⚔️',
-			artifacts: '✨',
-			concepts: '🎯',
-			creatures: '🐉'
-		};
-		return icons[category] || '📖';
-	}
+	$: colors = getCategoryColors(entry.category);
 </script>
 
 <div class="sticky top-4">
-	<div class="card bg-azaria-content border-2 border-azaria-gold/50 ornate-border">
-		<div class="card-body">
+	<div 
+		class="relative overflow-hidden rounded-lg"
+		style="
+			border: 2px solid {colors.border}80;
+			background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px {colors.glow}40;
+		"
+	>
+		<!-- Subtle category background -->
+		<div 
+			class="absolute inset-0 opacity-5"
+			style="background: linear-gradient(135deg, {colors.bg} 0%, transparent 50%, {colors.bg} 100%);"
+		></div>
+		
+		<div class="p-6 relative z-10">
 			<!-- Title with Icon -->
-			<h2 class="card-title text-azaria-gold font-heading text-xl mb-4">
-				{getCategoryIcon(entry.category)} {entry.title}
+			<h2 class="card-title font-heading text-xl mb-4" style="color: {colors.primary}; text-shadow: 0 0 6px {colors.glow};">
+				<Icon icon={getCategoryIcon(entry.category)} class="w-6 h-6 inline" style="color: {colors.primary};" />
+				{entry.title}
 			</h2>
 			
 			<!-- Main Image (placeholder) -->

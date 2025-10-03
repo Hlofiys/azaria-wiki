@@ -2,8 +2,19 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import Icon from '@iconify/svelte';
+	import { getCategoryColors } from '$lib/icons.js';
 	
 	let searchQuery = '';
+	
+	// Navigation items with their categories for coloring
+	const navItems = [
+		{ href: '/characters', category: 'characters', icon: 'mdi:crown', label: 'Персонажи' },
+		{ href: '/locations', category: 'locations', icon: 'mdi:castle', label: 'Локации' },
+		{ href: '/factions', category: 'factions', icon: 'mdi:sword-cross', label: 'Фракции' },
+		{ href: '/artifacts', category: 'artifacts', icon: 'mdi:star-four-points', label: 'Артефакты' },
+		{ href: '/concepts', category: 'concepts', icon: 'mdi:target', label: 'Концепции' },
+		{ href: '/creatures', category: 'creatures', icon: 'mdi:dragon', label: 'Существа' }
+	];
 	
 	async function handleSearch() {
 		if (searchQuery.trim()) {
@@ -30,7 +41,7 @@
 			<!-- Logo and Title -->
 			<div class="flex items-center space-x-4">
 				<a href="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-					<div class="text-4xl">🎰</div>
+					<Icon icon="mdi:slot-machine" class="text-4xl text-azaria-gold" />
 					<div>
 						<h1 style="font-size: 1.875rem; font-family: 'Cinzel Decorative', serif; font-weight: bold; color: #c9a876;">
 							Азария
@@ -44,24 +55,27 @@
 			
 			<!-- Navigation -->
 			<nav class="hidden md:flex items-center space-x-6">
-				<a href="/characters" class="nav-link" class:active={$page.url.pathname.startsWith('/characters')}>
-					<Icon icon="mdi:crown" width="16" class="inline mr-1" /> Персонажи
-				</a>
-				<a href="/locations" class="nav-link" class:active={$page.url.pathname.startsWith('/locations')}>
-					<Icon icon="mdi:castle" width="16" class="inline mr-1" /> Локации
-				</a>
-				<a href="/factions" class="nav-link" class:active={$page.url.pathname.startsWith('/factions')}>
-					<Icon icon="mdi:sword-cross" width="16" class="inline mr-1" /> Фракции
-				</a>
-				<a href="/artifacts" class="nav-link" class:active={$page.url.pathname.startsWith('/artifacts')}>
-					<Icon icon="mdi:star-four-points" width="16" class="inline mr-1" /> Артефакты
-				</a>
-				<a href="/concepts" class="nav-link" class:active={$page.url.pathname.startsWith('/concepts')}>
-					<Icon icon="mdi:target" width="16" class="inline mr-1" /> Концепции
-				</a>
-				<a href="/creatures" class="nav-link" class:active={$page.url.pathname.startsWith('/creatures')}>
-					<Icon icon="mdi:dragon" width="16" class="inline mr-1" /> Существа
-				</a>
+				{#each navItems as item}
+					{@const colors = getCategoryColors(item.category)}
+					{@const isActive = $page.url.pathname.startsWith(item.href)}
+					<a 
+						href={item.href} 
+						class="nav-link transition-all duration-300 px-2 py-1 rounded"
+						class:active={isActive}
+						style="
+							color: {isActive ? colors.primary : '#d0d0d0'};
+							text-shadow: {isActive ? `0 0 4px ${colors.glow}` : 'none'};
+						"
+					>
+						<Icon 
+							icon={item.icon} 
+							width="16" 
+							class="inline mr-1" 
+							style="color: {isActive ? colors.primary : colors.secondary};"
+						/> 
+						{item.label}
+					</a>
+				{/each}
 			</nav>
 			
 			<!-- Search and Random -->
@@ -92,12 +106,27 @@
 		<!-- Mobile Navigation -->
 		<div class="md:hidden mt-4">
 			<div class="grid grid-cols-3 gap-2 text-sm">
-				<a href="/characters" class="nav-link-mobile"><Icon icon="mdi:crown" width="14" class="inline mr-1" /> Персонажи</a>
-				<a href="/locations" class="nav-link-mobile"><Icon icon="mdi:castle" width="14" class="inline mr-1" /> Локации</a>
-				<a href="/factions" class="nav-link-mobile"><Icon icon="mdi:sword-cross" width="14" class="inline mr-1" /> Фракции</a>
-				<a href="/artifacts" class="nav-link-mobile"><Icon icon="mdi:star-four-points" width="14" class="inline mr-1" /> Артефакты</a>
-				<a href="/concepts" class="nav-link-mobile"><Icon icon="mdi:target" width="14" class="inline mr-1" /> Концепции</a>
-				<a href="/creatures" class="nav-link-mobile"><Icon icon="mdi:dragon" width="14" class="inline mr-1" /> Существа</a>
+				{#each navItems as item}
+					{@const colors = getCategoryColors(item.category)}
+					{@const isActive = $page.url.pathname.startsWith(item.href)}
+					<a 
+						href={item.href} 
+						class="nav-link-mobile transition-all duration-300"
+						style="
+							color: {isActive ? colors.primary : '#d0d0d0'};
+							border: 1px solid {isActive ? colors.border : 'transparent'};
+							background: {isActive ? colors.bg : 'transparent'};
+						"
+					>
+						<Icon 
+							icon={item.icon} 
+							width="14" 
+							class="inline mr-1" 
+							style="color: {isActive ? colors.primary : colors.secondary};"
+						/> 
+						{item.label}
+					</a>
+				{/each}
 			</div>
 		</div>
 	</div>
