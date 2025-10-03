@@ -40,21 +40,21 @@ COPY --from=builder /app/build /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Create nginx.conf to override default settings for non-root
+RUN printf 'pid /tmp/nginx.pid;\nerror_log /dev/stderr;\nevents { worker_connections 1024; }\nhttp { include /etc/nginx/mime.types; include /etc/nginx/conf.d/*.conf; }\n' > /etc/nginx/nginx.conf
+
 # Create non-root user for security
 RUN addgroup -g 1001 -S azaria && \
     adduser -S azaria -u 1001
 
-# Set ownership and permissions
+# Set ownership and permissions for directories nginx needs
 RUN chown -R azaria:azaria /usr/share/nginx/html && \
     chown -R azaria:azaria /var/cache/nginx && \
+    chown -R azaria:azaria /etc/nginx/conf.d && \
+    mkdir -p /var/log/nginx && \
     chown -R azaria:azaria /var/log/nginx && \
-    chown -R azaria:azaria /etc/nginx/conf.d
-
-# Create PID directory for nginx and set permissions
-RUN mkdir -p /var/run/nginx && \
-    chown -R azaria:azaria /var/run/nginx && \
-    touch /var/run/nginx/nginx.pid && \
-    chown azaria:azaria /var/run/nginx/nginx.pid
+    mkdir -p /tmp && \
+    chown -R azaria:azaria /tmp
 
 # Switch to non-root user
 USER azaria
