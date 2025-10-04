@@ -3,7 +3,7 @@
 /* Azaria Wiki Theme - Enhanced Visual Interest */
 body {
 	background-color: #1a1a1a;
-	background-image: 
+	background-image:
 		radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.02) 0%, transparent 50%),
 		radial-gradient(circle at 75% 75%, rgba(175, 122, 197, 0.02) 0%, transparent 50%),
 		radial-gradient(circle at 50% 100%, rgba(93, 173, 226, 0.01) 0%, transparent 60%);
@@ -11,7 +11,12 @@ body {
 	font-family: 'Lora', serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
 	color: #c9a876;
 	font-family: 'Cinzel Decorative', serif;
 	text-shadow: 0 0 4px rgba(201, 168, 118, 0.2);
@@ -76,11 +81,21 @@ a:hover {
 }
 
 @keyframes roll {
-	0% { transform: rotate(0deg); }
-	25% { transform: rotate(90deg); }
-	50% { transform: rotate(180deg); }
-	75% { transform: rotate(270deg); }
-	100% { transform: rotate(360deg); }
+	0% {
+		transform: rotate(0deg);
+	}
+	25% {
+		transform: rotate(90deg);
+	}
+	50% {
+		transform: rotate(180deg);
+	}
+	75% {
+		transform: rotate(270deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 /* Enhanced visual effects */
@@ -95,8 +110,13 @@ a:hover {
 
 /* Subtle pulse animation for important elements */
 @keyframes subtle-pulse {
-	0%, 100% { opacity: 1; }
-	50% { opacity: 0.8; }
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.8;
+	}
 }
 
 .pulse-glow {
@@ -105,9 +125,16 @@ a:hover {
 
 /* Floating particles animation */
 @keyframes float {
-	0%, 100% { transform: translateY(0px) rotate(0deg); }
-	33% { transform: translateY(-10px) rotate(120deg); }
-	66% { transform: translateY(5px) rotate(240deg); }
+	0%,
+	100% {
+		transform: translateY(0px) rotate(0deg);
+	}
+	33% {
+		transform: translateY(-10px) rotate(120deg);
+	}
+	66% {
+		transform: translateY(5px) rotate(240deg);
+	}
 }
 
 .floating-particle {
@@ -116,8 +143,13 @@ a:hover {
 
 /* Icon bounce animation */
 @keyframes icon-bounce {
-	0%, 100% { transform: scale(1); }
-	50% { transform: scale(1.1); }
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.1);
+	}
 }
 
 .icon-bounce:hover {
@@ -142,8 +174,13 @@ a:hover {
 
 /* Gentle glow animation */
 @keyframes gentle-glow {
-	0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
-	50% { filter: drop-shadow(0 0 15px currentColor); }
+	0%,
+	100% {
+		filter: drop-shadow(0 0 5px currentColor);
+	}
+	50% {
+		filter: drop-shadow(0 0 15px currentColor);
+	}
 }
 
 .gentle-glow {
@@ -151,14 +188,140 @@ a:hover {
 }
 
 /* Category-specific glows */
-.glow-characters { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
-.glow-locations { box-shadow: 0 0 20px rgba(93, 173, 226, 0.3); }
-.glow-factions { box-shadow: 0 0 20px rgba(231, 76, 60, 0.3); }
-.glow-artifacts { box-shadow: 0 0 20px rgba(175, 122, 197, 0.3); }
-.glow-concepts { box-shadow: 0 0 20px rgba(88, 214, 141, 0.3); }
-.glow-creatures { box-shadow: 0 0 20px rgba(243, 156, 18, 0.3); }
+.glow-characters {
+	box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+.glow-locations {
+	box-shadow: 0 0 20px rgba(93, 173, 226, 0.3);
+}
+.glow-factions {
+	box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+}
+.glow-artifacts {
+	box-shadow: 0 0 20px rgba(175, 122, 197, 0.3);
+}
+.glow-concepts {
+	box-shadow: 0 0 20px rgba(88, 214, 141, 0.3);
+}
+.glow-creatures {
+	box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
+}
 
 /* Smooth transitions for all interactive elements */
 * {
-	transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	transition:
+		color 0.2s ease,
+		background-color 0.2s ease,
+		border-color 0.2s ease,
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+	/* Improve readability on mobile */
+	body {
+		font-size: 16px;
+		line-height: 1.6;
+	}
+
+	/* Better touch targets for mobile */
+	button,
+	a,
+	input,
+	select {
+		min-height: 44px;
+	}
+
+	/* Improve spacing on mobile */
+	.azaria-card {
+		padding: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	/* Better mobile navigation */
+	.nav-link-mobile {
+		padding: 0.75rem 0.5rem;
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* Mobile-friendly table styling */
+	table {
+		font-size: 0.875rem;
+	}
+
+	/* Improve mobile images */
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	/* Mobile-friendly headings */
+	h1 {
+		font-size: 1.75rem;
+		line-height: 1.3;
+	}
+
+	h2 {
+		font-size: 1.5rem;
+		line-height: 1.3;
+	}
+
+	h3 {
+		font-size: 1.25rem;
+		line-height: 1.3;
+	}
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+	/* Even better touch targets for small screens */
+	button,
+	a,
+	input,
+	select {
+		min-height: 48px;
+	}
+
+	/* More padding on small screens */
+	.azaria-card {
+		padding: 0.75rem;
+	}
+
+	/* Smaller headings for very small screens */
+	h1 {
+		font-size: 1.5rem;
+	}
+
+	h2 {
+		font-size: 1.25rem;
+	}
+
+	h3 {
+		font-size: 1.125rem;
+	}
+}
+
+/* Ensure proper viewport handling */
+html {
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+}
+
+/* Prevent horizontal scrolling on mobile */
+body {
+	overflow-x: hidden;
+	max-width: 100vw;
+}
+
+/* Improve mobile scrolling */
+@media (max-width: 768px) {
+	html,
+	body {
+		-webkit-overflow-scrolling: touch;
+		scroll-behavior: smooth;
+	}
 }

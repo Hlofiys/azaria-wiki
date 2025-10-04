@@ -1,6 +1,7 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
-	
+	import { resolve } from '$app/paths';
+
 	onMount(() => {
 		// Redirect to the CMS
 		window.location.href = '/admin/index.html';
@@ -11,14 +12,14 @@
 	<title>Азария CMS — Админ панель</title>
 </svelte:head>
 
-<div class="min-h-screen flex items-center justify-center">
+<div class="flex min-h-screen items-center justify-center">
 	<div class="text-center">
-		<h1 class="text-3xl font-heading text-azaria-gold mb-4">
-			Перенаправление в CMS...
-		</h1>
+		<h1 class="font-heading text-azaria-gold mb-4 text-3xl">Перенаправление в CMS...</h1>
 		<p class="text-azaria-text">
-			Если перенаправление не произошло автоматически, 
-			<a href="/admin/index.html" class="text-azaria-gold underline">нажмите здесь</a>
+			Если перенаправление не произошло автоматически,
+			<a href={resolve('/admin/index.html' as `/${string}`)} class="text-azaria-gold underline"
+				>нажмите здесь</a
+			>
 		</p>
 	</div>
 </div>

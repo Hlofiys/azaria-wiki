@@ -1,32 +1,35 @@
-<script>
+<script lang="ts">
 	import LoreCard from '$lib/components/ui/LoreCard.svelte';
-	import { goto } from '$app/navigation';
-	import { Icon, getCategoryIcon, getUIIcon, getCategoryColors } from '$lib/icons.js';
-	
-	export let data;
-	
+	import { Icon, getCategoryIcon, getUIIcon, getCategoryColors } from '$lib/icons';
+	import { resolve } from '$app/paths';
+	import type { EntryListItem } from '$lib/server/lore-parser';
+	import type { CategoryType } from '$lib/icons';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+
 	let isSpinning = false;
-	let slotResults = [];
-	
+	let slotResults: EntryListItem[] = [];
+
 	// Slot machine functionality
 	async function spinSlotMachine() {
 		if (isSpinning) return;
-		
+
 		isSpinning = true;
 		slotResults = [];
-		
+
 		// Simulate spinning animation
-		await new Promise(resolve => setTimeout(resolve, 2000));
-		
+		await new Promise((resolve) => setTimeout(resolve, 2000));
+
 		// Select 3 random entries
 		const shuffled = [...data.slotMachineEntries].sort(() => Math.random() - 0.5);
 		slotResults = shuffled.slice(0, 3);
-		
+
 		isSpinning = false;
 	}
-	
+
 	// Quick navigation to categories
-	const categories = [
+	const categories: Array<{ name: CategoryType; title: string; description: string }> = [
 		{ name: 'characters', title: 'Персонажи', description: 'Влиятельные личности' },
 		{ name: 'locations', title: 'Локации', description: 'Города и места' },
 		{ name: 'factions', title: 'Фракции', description: 'Государства и организации' },
@@ -38,54 +41,106 @@
 
 <svelte:head>
 	<title>Азария Вики — Медивал-деп-панк вселенная</title>
-	<meta name="description" content="Исследуйте мир Азарии - уникальную медивал-деп-панк вселенную, где средневековье встречается с философией азарта и удачи." />
+	<meta
+		name="description"
+		content="Исследуйте мир Азарии - уникальную медивал-деп-панк вселенную, где средневековье встречается с философией азарта и удачи."
+	/>
 </svelte:head>
 
-<div class="max-w-7xl mx-auto">
+<div class="mx-auto max-w-7xl">
 	<!-- Hero Section -->
-	<div class="text-center mb-12 relative">
+	<div class="relative mb-12 text-center">
 		<!-- Floating decorative particles -->
-		<div class="absolute inset-0 overflow-hidden pointer-events-none">
-			<div class="floating-particle absolute top-10 left-10 text-yellow-500 opacity-20" style="animation-delay: 0s;">✨</div>
-			<div class="floating-particle absolute top-20 right-20 text-blue-500 opacity-20" style="animation-delay: 1s;">🏰</div>
-			<div class="floating-particle absolute bottom-20 left-20 text-red-500 opacity-20" style="animation-delay: 2s;">⚔️</div>
-			<div class="floating-particle absolute bottom-10 right-10 text-purple-500 opacity-20" style="animation-delay: 3s;">🔮</div>
+		<div class="pointer-events-none absolute inset-0 overflow-hidden">
+			<div
+				class="floating-particle absolute top-10 left-10 text-yellow-500 opacity-20"
+				style="animation-delay: 0s;"
+			>
+				✨
+			</div>
+			<div
+				class="floating-particle absolute top-20 right-20 text-blue-500 opacity-20"
+				style="animation-delay: 1s;"
+			>
+				🏰
+			</div>
+			<div
+				class="floating-particle absolute bottom-20 left-20 text-red-500 opacity-20"
+				style="animation-delay: 2s;"
+			>
+				⚔️
+			</div>
+			<div
+				class="floating-particle absolute right-10 bottom-10 text-purple-500 opacity-20"
+				style="animation-delay: 3s;"
+			>
+				🔮
+			</div>
 		</div>
-		
-		<h1 class="text-5xl md:text-7xl font-heading text-azaria-gold mb-6 relative z-10">
-			<Icon icon={getUIIcon('slot')} class="inline mr-4 icon-bounce gentle-glow" style="vertical-align: middle;" />
-			Добро пожаловать в Азарию
+
+		<h1
+			class="font-heading text-azaria-gold relative z-10 mb-4 text-center text-3xl sm:text-4xl md:mb-6 md:text-5xl lg:text-7xl"
+		>
+			<div class="flex flex-col items-center justify-center gap-2 sm:flex-row md:gap-4">
+				<Icon
+					icon={getUIIcon('slot')}
+					class="icon-bounce gentle-glow"
+					style="vertical-align: middle;"
+				/>
+				<span>Добро пожаловать в Азарию</span>
+			</div>
 		</h1>
-		<p class="text-xl md:text-2xl text-azaria-text/80 font-body max-w-3xl mx-auto mb-8 relative z-10">
-			Погрузитесь в мир, где средневековье встречается с философией азарта, 
-			где удача правит королевствами, а деп становится искусством.
+		<p
+			class="text-azaria-text/80 font-body relative z-10 mx-auto mb-6 max-w-3xl px-4 text-center text-lg md:mb-8 md:text-xl lg:text-2xl"
+		>
+			Погрузитесь в мир, где средневековье встречается с философией азарта, где удача правит
+			королевствами, а деп становится искусством.
 		</p>
-		<div class="flex flex-wrap justify-center gap-4 text-sm text-azaria-text/60 relative z-10">
-			<span class="icon-bounce"><Icon icon={getUIIcon('book')} class="inline mr-1" /> {data.totalEntries} статей</span>
-			<span class="icon-bounce"><Icon icon={getCategoryIcon('characters')} class="inline mr-1" style="color: #FFD700;" /> Персонажи</span>
-			<span class="icon-bounce"><Icon icon={getCategoryIcon('locations')} class="inline mr-1" style="color: #5DADE2;" /> Локации</span>
-			<span class="icon-bounce"><Icon icon={getCategoryIcon('factions')} class="inline mr-1" style="color: #E74C3C;" /> Фракции</span>
-			<span class="icon-bounce"><Icon icon={getCategoryIcon('artifacts')} class="inline mr-1" style="color: #AF7AC5;" /> Артефакты</span>
+		<div
+			class="text-azaria-text/60 relative z-10 flex flex-wrap justify-center gap-2 px-4 text-xs md:gap-4 md:text-sm"
+		>
+			<span class="icon-bounce"
+				><Icon icon={getUIIcon('book')} class="mr-1 inline" /> {data.totalEntries} статей</span
+			>
+			<span class="icon-bounce"
+				><Icon icon={getCategoryIcon('characters')} class="mr-1 inline" style="color: #FFD700;" /> Персонажи</span
+			>
+			<span class="icon-bounce"
+				><Icon icon={getCategoryIcon('locations')} class="mr-1 inline" style="color: #5DADE2;" /> Локации</span
+			>
+			<span class="icon-bounce"
+				><Icon icon={getCategoryIcon('factions')} class="mr-1 inline" style="color: #E74C3C;" /> Фракции</span
+			>
+			<span class="icon-bounce"
+				><Icon icon={getCategoryIcon('artifacts')} class="mr-1 inline" style="color: #AF7AC5;" /> Артефакты</span
+			>
 		</div>
 	</div>
-	
+
 	<!-- Slot Machine of Fate -->
-	<div class="relative overflow-hidden rounded-lg mb-12" style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid #FFD700; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 215, 0, 0.3);">
-		<div class="p-8 text-center relative z-10">
-			<h2 class="text-3xl font-heading text-azaria-gold mb-4">
-				<Icon icon={getUIIcon('slot')} class="inline mr-2" style="vertical-align: middle;" />
-				Слот-машина Судьбы
+	<div
+		class="relative mb-8 overflow-hidden rounded-lg md:mb-12"
+		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid #FFD700; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 215, 0, 0.3);"
+	>
+		<div class="relative z-10 p-4 text-center md:p-8">
+			<h2 class="font-heading text-azaria-gold mb-3 text-xl md:mb-4 md:text-2xl lg:text-3xl">
+				<div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+					<Icon icon={getUIIcon('slot')} style="vertical-align: middle;" />
+					<span>Слот-машина Судьбы</span>
+				</div>
 			</h2>
-			<p class="text-azaria-text/80 font-body mb-6">
+			<p class="text-azaria-text/80 font-body mb-4 px-2 text-sm md:mb-6 md:text-base">
 				Позвольте случайности выбрать ваше следующее приключение в мире Азарии
 			</p>
-			
+
 			<!-- Slot Machine Reels -->
-			<div class="flex justify-center items-center space-x-4 mb-6">
-				{#each [0, 1, 2] as reelIndex}
-					{@const resultColors = slotResults[reelIndex] ? getCategoryColors(slotResults[reelIndex].category) : null}
-					<div 
-						class="w-32 h-40 rounded-lg flex flex-col justify-center items-center p-2 relative overflow-hidden transition-all duration-300"
+			<div class="mb-4 flex items-center justify-center space-x-2 md:mb-6 md:space-x-4">
+				{#each [0, 1, 2] as reelIndex (reelIndex)}
+					{@const resultColors = slotResults[reelIndex]
+						? getCategoryColors(slotResults[reelIndex].category)
+						: getCategoryColors('characters')}
+					<div
+						class="relative flex h-24 w-20 flex-col items-center justify-center overflow-hidden rounded-lg p-1 transition-all duration-300 sm:h-32 sm:w-24 md:h-40 md:w-32 md:p-2"
 						style="
 							background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%);
 							border: 2px solid {resultColors ? resultColors.border : '#FFD700'};
@@ -94,75 +149,92 @@
 					>
 						{#if resultColors}
 							<!-- Category background glow -->
-							<div 
+							<div
 								class="absolute inset-0 opacity-20"
 								style="background: radial-gradient(circle, {resultColors.bg} 0%, transparent 70%);"
 							></div>
 						{/if}
-						
-						<div class="relative z-10">
+
+						<div class="relative z-10 flex h-full flex-col items-center justify-center">
 							{#if isSpinning}
-								<div class="relative">
-									<Icon 
-										icon={getUIIcon('dice')} 
-										class="text-4xl mb-2 animate-spin" 
+								<div class="relative flex flex-col items-center">
+									<Icon
+										icon={getUIIcon('dice')}
+										class="mb-1 animate-spin text-2xl sm:text-3xl md:mb-2 md:text-4xl"
 										style="color: #FFD700; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));"
 									/>
 									<!-- Spinning blur effect -->
-									<div class="absolute inset-0 animate-pulse" style="background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);"></div>
+									<div
+										class="absolute inset-0 animate-pulse"
+										style="background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);"
+									></div>
 								</div>
-								<div class="text-xs text-azaria-text/50 animate-pulse">Крутится...</div>
+								<div class="text-azaria-text/50 hidden animate-pulse text-center text-xs sm:block">
+									Крутится...
+								</div>
 							{:else if slotResults[reelIndex]}
-								<div class="relative">
-									<Icon 
-										icon={getCategoryIcon(slotResults[reelIndex].category)} 
-										class="text-3xl mb-2 icon-bounce gentle-glow" 
-										style="color: {resultColors.primary}; filter: drop-shadow(0 0 8px {resultColors.glow});"
+								{@const colors = getCategoryColors(slotResults[reelIndex].category)}
+								<div class="relative flex flex-col items-center">
+									<Icon
+										icon={getCategoryIcon(slotResults[reelIndex].category)}
+										class="icon-bounce gentle-glow mb-1 text-xl sm:text-2xl md:mb-2 md:text-3xl"
+										style="color: {colors.primary}; filter: drop-shadow(0 0 8px {colors.glow});"
 									/>
 									<!-- Victory sparkle effect -->
-									<div class="absolute -top-1 -right-1 text-yellow-300 opacity-75 animate-ping">✨</div>
+									<div
+										class="absolute -top-1 -right-1 animate-ping text-xs text-yellow-300 opacity-75"
+									>
+										✨
+									</div>
 								</div>
-								<div class="text-xs font-semibold text-center px-1 fade-in-up" style="color: {resultColors.primary};">
+								<div
+									class="fade-in-up truncate px-1 text-center text-xs font-semibold"
+									style="color: {colors.primary}; max-width: 100%;"
+								>
 									{slotResults[reelIndex].title}
 								</div>
 							{:else}
-								<Icon 
-									icon={getUIIcon('question')} 
-									class="text-4xl mb-2 opacity-50 pulse-glow" 
-									style="color: #666;"
-								/>
-								<div class="text-xs text-azaria-text/50">Готов к спину</div>
+								<div class="flex flex-col items-center">
+									<Icon
+										icon={getUIIcon('question')}
+										class="pulse-glow mb-1 text-2xl opacity-50 sm:text-3xl md:mb-2 md:text-4xl"
+										style="color: #666;"
+									/>
+									<div class="text-azaria-text/50 hidden text-center text-xs sm:block">Готов</div>
+								</div>
 							{/if}
 						</div>
 					</div>
 				{/each}
 			</div>
-			
+
 			<!-- Spin Button -->
-			<button 
+			<button
 				on:click={spinSlotMachine}
 				disabled={isSpinning}
-				class="btn btn-primary btn-lg text-lg font-heading px-8"
+				class="azaria-btn font-heading px-4 py-2 text-sm md:px-6 md:py-3 md:text-base lg:px-8 lg:text-lg"
 				class:loading={isSpinning}
 			>
 				{#if isSpinning}
-					<Icon icon={getUIIcon('dice')} class="inline mr-2" />
+					<Icon icon={getUIIcon('dice')} class="mr-1 inline md:mr-2" />
 					Крутится...
 				{:else}
-					<Icon icon={getUIIcon('slot')} class="inline mr-2" />
+					<Icon icon={getUIIcon('slot')} class="mr-1 inline md:mr-2" />
 					Спинануть судьбу!
 				{/if}
 			</button>
-			
+
 			<!-- Slot Results -->
 			{#if slotResults.length > 0 && !isSpinning}
-				<div class="mt-8">
-					<h3 class="text-xl font-heading text-azaria-gold mb-4">
-						<Icon icon={getCategoryIcon('artifacts')} class="inline mr-2" />
-						Судьба выбрала для вас:
+				<div class="mt-6 md:mt-8">
+					<h3 class="font-heading text-azaria-gold mb-3 text-lg md:mb-4 md:text-xl">
+						<div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+							<Icon icon={getCategoryIcon('artifacts')} />
+							<span>Судьба выбрала для вас:</span>
+						</div>
 					</h3>
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-						{#each slotResults as entry}
+					<div class="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
+						{#each slotResults as entry (entry.slug)}
 							<LoreCard {entry} showCategory={true} />
 						{/each}
 					</div>
@@ -170,19 +242,21 @@
 			{/if}
 		</div>
 	</div>
-	
+
 	<!-- Category Navigation -->
-	<div class="mb-12">
-		<h2 class="text-3xl font-heading text-azaria-gold mb-6 text-center">
-			<Icon icon={getUIIcon('library')} class="inline mr-2" />
-			Исследуйте мир Азарии
+	<div class="mb-8 md:mb-12">
+		<h2 class="font-heading text-azaria-gold mb-4 text-center text-2xl md:mb-6 md:text-3xl">
+			<div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+				<Icon icon={getUIIcon('library')} />
+				<span>Исследуйте мир Азарии</span>
+			</div>
 		</h2>
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			{#each categories as category}
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+			{#each categories as category (category.name)}
 				{@const colors = getCategoryColors(category.name)}
-				<a 
-					href="/{category.name}"
-					class="relative overflow-hidden group transition-all duration-300 hover:scale-105 rounded-lg"
+				<a
+					href={resolve(`/${category.name}` as `/${string}`)}
+					class="group relative overflow-hidden rounded-lg transition-all duration-300 hover:scale-105"
 					style="
 						background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
 						border: 2px solid {colors.border}50;
@@ -190,27 +264,32 @@
 					"
 				>
 					<!-- Animated background gradient -->
-					<div 
-						class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+					<div
+						class="absolute inset-0 opacity-10 transition-opacity duration-500 group-hover:opacity-20"
 						style="background: linear-gradient(135deg, {colors.bg} 0%, transparent 30%, {colors.bg} 70%, transparent 100%);"
 					></div>
-					
+
 					<!-- Glowing border effect on hover -->
-					<div 
-						class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"
+					<div
+						class="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 						style="box-shadow: inset 0 0 20px {colors.glow};"
 					></div>
-					
-					<div class="p-6 text-center relative z-10">
-						<Icon 
-							icon={getCategoryIcon(category.name)} 
-							class="text-4xl mb-3 transition-all duration-300 group-hover:scale-110" 
+
+					<div class="relative z-10 p-4 text-center md:p-6">
+						<Icon
+							icon={getCategoryIcon(category.name)}
+							class="mb-2 text-3xl transition-all duration-300 group-hover:scale-110 md:mb-3 md:text-4xl"
 							style="color: {colors.primary}; filter: drop-shadow(0 0 8px {colors.glow});"
 						/>
-						<h3 class="text-xl font-heading mb-2 transition-all duration-300" style="color: {colors.primary}; text-shadow: 0 0 4px {colors.glow};">
+						<h3
+							class="font-heading mb-2 text-lg transition-all duration-300 md:text-xl"
+							style="color: {colors.primary}; text-shadow: 0 0 4px {colors.glow};"
+						>
 							{category.title}
 						</h3>
-						<p class="text-azaria-text/70 font-body text-sm group-hover:text-azaria-text/90 transition-colors duration-300">
+						<p
+							class="text-azaria-text/70 font-body group-hover:text-azaria-text/90 text-sm transition-colors duration-300"
+						>
 							{category.description}
 						</p>
 					</div>
@@ -218,43 +297,55 @@
 			{/each}
 		</div>
 	</div>
-	
+
 	<!-- Featured Entries -->
-	<div class="mb-12">
-		<h2 class="text-3xl font-heading text-azaria-gold mb-6 text-center">
-			<Icon icon={getUIIcon('star')} class="inline mr-2" />
-			Избранные статьи
+	<div class="mb-8 md:mb-12">
+		<h2 class="font-heading text-azaria-gold mb-4 text-center text-2xl md:mb-6 md:text-3xl">
+			<div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+				<Icon icon={getUIIcon('star')} />
+				<span>Избранные статьи</span>
+			</div>
 		</h2>
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			{#each data.featuredEntries as entry}
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+			{#each data.featuredEntries as entry (entry.slug)}
 				<LoreCard {entry} showCategory={true} />
 			{/each}
 		</div>
 	</div>
-	
+
 	<!-- Call to Action -->
-	<div class="text-center rounded-lg p-8 relative overflow-hidden" style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid #FFD70050; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 215, 0, 0.2);">
+	<div
+		class="relative overflow-hidden rounded-lg p-4 text-center md:p-8"
+		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid #FFD70050; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 215, 0, 0.2);"
+	>
 		<!-- Subtle background effect -->
-		<div class="absolute inset-0 opacity-5" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%, rgba(255, 215, 0, 0.1) 100%);"></div>
-		
+		<div
+			class="absolute inset-0 opacity-5"
+			style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%, rgba(255, 215, 0, 0.1) 100%);"
+		></div>
+
 		<div class="relative z-10">
-			<h2 class="text-2xl font-heading text-azaria-gold mb-4" style="text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);">
-				<Icon icon={getCategoryIcon('concepts')} class="inline mr-2" style="color: #FFD700;" />
-				Готовы погрузиться в мир Азарии?
+			<h2
+				class="font-heading text-azaria-gold mb-3 text-xl md:mb-4 md:text-2xl"
+				style="text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);"
+			>
+				<div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
+					<Icon icon={getCategoryIcon('concepts')} style="color: #FFD700;" />
+					<span>Готовы погрузиться в мир Азарии?</span>
+				</div>
 			</h2>
-			<p class="text-azaria-text/80 font-body mb-6 max-w-2xl mx-auto">
-				Откройте для себя богатую историю империй, познакомьтесь с легендарными персонажами, 
-				изучите магические артефакты и понимайте философию удачи и депа.
+			<p
+				class="text-azaria-text/80 font-body mx-auto mb-4 max-w-2xl px-4 text-sm md:mb-6 md:text-base"
+			>
+				Откройте для себя богатую историю империй, познакомьтесь с легендарными персонажами, изучите
+				магические артефакты и понимайте философию удачи и депа.
 			</p>
-			<div class="flex flex-wrap justify-center gap-4">
-				{#each [
-					{ href: '/characters', category: 'characters', label: 'Начать с персонажей' },
-					{ href: '/concepts', category: 'concepts', label: 'Понять концепции' }
-				] as button}
+			<div class="flex flex-col flex-wrap justify-center gap-3 px-4 sm:flex-row md:gap-4">
+				{#each [{ href: '/characters', category: 'characters' as CategoryType, label: 'Начать с персонажей' }, { href: '/concepts', category: 'concepts' as CategoryType, label: 'Понять концепции' }] as button (button.href)}
 					{@const colors = getCategoryColors(button.category)}
-					<a 
-						href={button.href} 
-						class="inline-block px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
+					<a
+						href={resolve(button.href as `/${string}`)}
+						class="inline-block rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg md:px-6 md:py-3 md:text-base"
 						style="
 							border: 2px solid {colors.border};
 							color: {colors.primary};
@@ -263,7 +354,11 @@
 							text-decoration: none;
 						"
 					>
-						<Icon icon={getCategoryIcon(button.category)} class="inline mr-2" style="color: {colors.primary};" />
+						<Icon
+							icon={getCategoryIcon(button.category)}
+							class="mr-1 inline md:mr-2"
+							style="color: {colors.primary};"
+						/>
 						{button.label}
 					</a>
 				{/each}

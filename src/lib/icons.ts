@@ -1,17 +1,51 @@
 import Icon from '@iconify/svelte';
 
+// Type definitions
+export interface CategoryColors {
+	primary: string;
+	secondary: string;
+	accent: string;
+	border: string;
+	bg: string;
+	glow: string;
+}
+
+export type CategoryType =
+	| 'characters'
+	| 'locations'
+	| 'factions'
+	| 'artifacts'
+	| 'concepts'
+	| 'creatures';
+
+export type UIIconType =
+	| 'book'
+	| 'dice'
+	| 'slot'
+	| 'question'
+	| 'star'
+	| 'search'
+	| 'home'
+	| 'library'
+	| 'faction'
+	| 'type'
+	| 'status'
+	| 'age'
+	| 'population'
+	| 'loading';
+
 // Category icon mappings using Iconify icons
-export const categoryIcons = {
+export const categoryIcons: Record<CategoryType, string> = {
 	characters: 'mdi:crown',
 	locations: 'mdi:castle',
 	factions: 'mdi:sword-cross',
 	artifacts: 'mdi:star-circle',
 	concepts: 'mdi:target',
-	creatures: 'mdi:dragon'
+	creatures: 'game-icons:sea-dragon'
 };
 
 // Category color mappings for visual distinction
-export const categoryColors = {
+export const categoryColors: Record<CategoryType, CategoryColors> = {
 	characters: {
 		primary: '#FFD700', // Royal gold
 		secondary: '#F4D03F', // Light gold
@@ -63,7 +97,7 @@ export const categoryColors = {
 };
 
 // UI element icon mappings
-export const uiIcons = {
+export const uiIcons: Record<UIIconType, string> = {
 	book: 'mdi:book-open-page-variant',
 	dice: 'mdi:dice-6',
 	slot: 'mdi:slot-machine',
@@ -81,30 +115,32 @@ export const uiIcons = {
 };
 
 // Get category icon name
-export function getCategoryIcon(category) {
+export function getCategoryIcon(category: CategoryType): string {
 	return categoryIcons[category] || uiIcons.book;
 }
 
 // Get category colors
-export function getCategoryColors(category) {
-	return categoryColors[category] || {
-		primary: '#c9a876',
-		secondary: '#e6c190',
-		accent: '#b8956a',
-		border: '#c9a876',
-		bg: 'rgba(201, 168, 118, 0.1)',
-		glow: 'rgba(201, 168, 118, 0.3)'
-	};
+export function getCategoryColors(category: CategoryType): CategoryColors {
+	return (
+		categoryColors[category] || {
+			primary: '#c9a876',
+			secondary: '#e6c190',
+			accent: '#b8956a',
+			border: '#c9a876',
+			bg: 'rgba(201, 168, 118, 0.1)',
+			glow: 'rgba(201, 168, 118, 0.3)'
+		}
+	);
 }
 
 // Get UI icon name
-export function getUIIcon(iconName) {
+export function getUIIcon(iconName: UIIconType): string {
 	return uiIcons[iconName] || uiIcons.book;
 }
 
 // Get Russian category name
-export function getCategoryNameRussian(category) {
-	const russianNames = {
+export function getCategoryNameRussian(category: CategoryType): string {
+	const russianNames: Record<CategoryType, string> = {
 		characters: 'Персонажи',
 		locations: 'Локации',
 		factions: 'Фракции',

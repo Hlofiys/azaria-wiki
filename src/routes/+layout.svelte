@@ -12,17 +12,19 @@
 
 <div style="min-height: 100vh; background-color: #1a1a1a;">
 	<Header />
-	
+
 	<main class="container mx-auto px-4 py-8">
 		{@render children?.()}
 	</main>
-	
+
 	<footer class="azaria-card border-t-2" style="border-top-color: #c9a876; margin-top: 4rem;">
 		<div class="container mx-auto px-4 py-8 text-center">
 			<p style="color: rgba(208, 208, 208, 0.7); font-family: 'Lora', serif;">
 				Вики мира Азарии — Медивал-деп-панк вселенная
 			</p>
-			<p style="color: rgba(208, 208, 208, 0.5); font-family: 'Lora', serif; font-size: 0.875rem; margin-top: 0.5rem;">
+			<p
+				style="color: rgba(208, 208, 208, 0.5); font-family: 'Lora', serif; font-size: 0.875rem; margin-top: 0.5rem;"
+			>
 				Создано с помощью SvelteKit и магии удачи
 			</p>
 		</div>
