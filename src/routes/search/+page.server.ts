@@ -1,33 +1,18 @@
-import { searchEntries } from '$lib/server/lore-parser';
+import { getAllEntriesFlat } from '$lib/server/lore-parser';
 import type { PageServerLoad } from './$types';
 import type { EntryListItem } from '$lib/server/lore-parser';
 
+export const prerender = true;
+
 export interface PageData {
-	results: EntryListItem[];
-	query: string;
+	allEntries: EntryListItem[]; // Pass all entries for client-side search
 }
 
-export const load: PageServerLoad<PageData> = async ({ url }) => {
-	const query = url.searchParams.get('q') || '';
+export const load: PageServerLoad<PageData> = async () => {
+	const allEntries = getAllEntriesFlat();
 
-	if (!query.trim()) {
-		return {
-			results: [],
-			query: ''
-		};
-	}
-
-	try {
-		const results = searchEntries(query);
-		return {
-			results,
-			query
-		};
-	} catch (error) {
-		console.error('Error searching entries:', error);
-		return {
-			results: [],
-			query
-		};
-	}
+	// For static builds, we'll do the search entirely on the client side
+	return {
+		allEntries
+	};
 };

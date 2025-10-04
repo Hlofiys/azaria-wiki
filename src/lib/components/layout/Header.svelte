@@ -5,6 +5,7 @@
 	import Icon from '@iconify/svelte';
 	import { getCategoryColors, getCategoryIcon } from '$lib/icons';
 	import type { CategoryType } from '$lib/icons';
+	import { getRandomEntry } from '$lib/client-data.js';
 
 	let searchQuery = '';
 
@@ -24,15 +25,14 @@
 		}
 	}
 
-	async function randomArticle() {
+	function randomArticle() {
 		try {
-			const response = await fetch('/api/random-article');
-			const data = await response.json();
-			if (data.url) {
-				goto(resolve(data.url));
+			const randomEntry = getRandomEntry();
+			if (randomEntry) {
+				goto(resolve(`/${randomEntry.category}/${randomEntry.slug}`));
 			}
 		} catch (error) {
-			console.error('Error fetching random article:', error);
+			console.error('Error getting random article:', error);
 		}
 	}
 </script>

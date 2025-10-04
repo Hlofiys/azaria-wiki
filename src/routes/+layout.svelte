@@ -1,8 +1,18 @@
 <script lang="ts">
 	import '../app.css';
 	import Header from '$lib/components/layout/Header.svelte';
+	import { initializeClientData } from '$lib/client-data.js';
+	import { onMount } from 'svelte';
+	import type { LayoutServerData } from './$types';
 
-	let { children } = $props();
+	let { children, data }: { children: any, data: LayoutServerData } = $props();
+	
+	onMount(() => {
+		// Initialize client data globally
+		if (data?.allEntries) {
+			initializeClientData(data.allEntries);
+		}
+	});
 </script>
 
 <svelte:head>

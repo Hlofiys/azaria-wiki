@@ -9,8 +9,12 @@ const config = {
 	preprocess: [vitePreprocess(), mdsvex()],
 	kit: {
 		adapter: adapter({
-			// Fallback for SPA mode
-			fallback: 'index.html'
+			// Default static adapter settings for better compatibility
+			pages: 'build',
+			assets: 'build',
+			fallback: null,
+			precompress: false,
+			strict: false  // Allow dynamic routes to be handled client-side
 		}),
 		prerender: {
 			handleHttpError: ({ path, referrer, message }) => {
