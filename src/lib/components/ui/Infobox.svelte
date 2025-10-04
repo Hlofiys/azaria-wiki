@@ -7,6 +7,24 @@
 	export let backlinks: EntryListItem[] = [];
 
 	$: colors = getCategoryColors(entry.category);
+
+	let showImageModal = false;
+
+	function openImageModal() {
+		showImageModal = true;
+		document.body.style.overflow = 'hidden';
+	}
+
+	function closeImageModal() {
+		showImageModal = false;
+		document.body.style.overflow = 'auto';
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			closeImageModal();
+		}
+	}
 </script>
 
 <div class="sticky top-4 lg:top-6">
@@ -40,12 +58,29 @@
 				</div>
 			</h2>
 
-			<!-- Main Image (placeholder) -->
+			<!-- Main Image -->
 			{#if entry.image}
-				<div
-					class="bg-azaria-dark/50 border-azaria-gold/30 mb-3 flex h-32 w-full items-center justify-center rounded-lg border sm:h-40 md:mb-4 md:h-48"
-				>
-					<span class="text-azaria-text/50 text-xs sm:text-sm">Изображение скоро появится</span>
+				<div class="mb-3 md:mb-4">
+					<button
+						on:click={openImageModal}
+						class="w-full cursor-zoom-in transition-transform hover:scale-105"
+					>
+						<img
+							src={entry.image}
+							alt={entry.title}
+							class="w-full rounded-lg object-cover"
+							style="
+								max-height: 200px;
+								border: 2px solid {colors.border}60;
+								box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+							"
+							loading="lazy"
+							on:error={(e) => {
+								// Hide image if it fails to load
+								e.target.style.display = 'none';
+							}}
+						/>
+					</button>
 				</div>
 			{/if}
 
@@ -239,3 +274,40 @@
 		</div>
 	</div>
 </div>
+
+<!-- Image Modal -->
+{#if showImageModal && entry.image}
+	<div
+		class="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-80 p-4"
+		on:click={closeImageModal}
+		on:keydown={handleKeydown}
+		role="dialog"
+		aria-modal="true"
+		aria-label="Увеличенное изображение {entry.title}"
+		tabindex="-1"
+	>
+		<div class="flex min-h-full items-center justify-center">
+			<div class="relative max-w-screen-lg">
+				<button
+					on:click={closeImageModal}
+					class="absolute -right-2 -top-2 z-10 rounded-full bg-black bg-opacity-70 p-2 text-white hover:bg-opacity-90"
+					style="color: #c9a876;"
+					aria-label="Закрыть изображение"
+					title="Закрыть изображение"
+				>
+					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+				<div class="rounded-lg" style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
+					<img
+						src={entry.image}
+						alt={entry.title}
+						class="max-w-full rounded-lg object-contain"
+						style="max-height: 90vh; width: auto; height: auto;"
+					/>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
