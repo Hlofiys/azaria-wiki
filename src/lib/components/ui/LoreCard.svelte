@@ -150,14 +150,8 @@
 		<div class="mt-3 flex justify-end">
 			<a
 				href={resolve(`/${entry.category}/${entry.slug}` as `/${string}/${string}`)}
-				class="inline-block rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg sm:px-4 sm:py-2 sm:text-sm"
-				style="
-					background: linear-gradient(145deg, #5a4a3a 0%, #6b5b4b 100%);
-					color: #d0d0d0;
-					border: 1px solid rgba(201, 168, 118, 0.5);
-					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-					text-decoration: none;
-				"
+				class="azaria-btn text-xs sm:text-sm"
+				style="padding: 0.375rem 0.75rem; font-size: 0.75rem;"
 			>
 				Читать далее →
 			</a>

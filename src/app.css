@@ -43,23 +43,28 @@ a:hover {
 }
 
 .azaria-btn {
-	background: linear-gradient(145deg, #5a4a3a 0%, #6b5b4b 100%);
-	color: #d0d0d0;
-	border: 1px solid #5a4a3a;
+	background: linear-gradient(145deg, #1a1a1a 0%, #242424 100%);
+	color: #c9a876;
+	border: 1px solid rgba(201, 168, 118, 0.4);
 	padding: 0.75rem 1.5rem;
 	border-radius: 0.5rem;
 	font-weight: 600;
 	transition: all 0.3s ease;
 	text-decoration: none;
-	display: inline-block;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 4px rgba(201, 168, 118, 0.2);
+	min-height: auto;
 }
 
 .azaria-btn:hover {
-	background: linear-gradient(145deg, #6b5b4b 0%, #7c6c5c 100%);
+	background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
 	transform: translateY(-1px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-	color: #e0e0e0;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 6px rgba(201, 168, 118, 0.4);
+	color: #e6c190;
+	border-color: #e6c190;
+	text-shadow: 0 0 2px rgba(201, 168, 118, 0.2);
 }
 
 .azaria-input {
@@ -232,6 +237,16 @@ a:hover {
 	select {
 		min-height: 44px;
 	}
+	
+	/* Fix button alignment and sizing on mobile */
+	.azaria-btn {
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.5rem 1rem;
+		text-align: center;
+	}
 
 	/* Improve spacing on mobile */
 	.azaria-card {
@@ -284,6 +299,13 @@ a:hover {
 	input,
 	select {
 		min-height: 48px;
+	}
+	
+	/* Fix button alignment for very small screens */
+	.azaria-btn {
+		min-height: 48px;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.875rem;
 	}
 
 	/* More padding on small screens */

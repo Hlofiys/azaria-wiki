@@ -120,7 +120,7 @@
 	<!-- Slot Machine of Fate -->
 	<div
 		class="relative mb-8 overflow-hidden rounded-lg md:mb-12"
-		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid #FFD700; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 215, 0, 0.3);"
+		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid rgba(201, 168, 118, 0.8); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 12px rgba(201, 168, 118, 0.3);"
 	>
 		<div class="relative z-10 p-4 text-center md:p-8">
 			<h2 class="font-heading text-azaria-gold mb-3 text-xl md:mb-4 md:text-2xl lg:text-3xl">
@@ -143,8 +143,8 @@
 						class="relative flex h-24 w-20 flex-col items-center justify-center overflow-hidden rounded-lg p-1 transition-all duration-300 sm:h-32 sm:w-24 md:h-40 md:w-32 md:p-2"
 						style="
 							background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%);
-							border: 2px solid {resultColors ? resultColors.border : '#FFD700'};
-							box-shadow: 0 0 15px {resultColors ? resultColors.glow : 'rgba(255, 215, 0, 0.3)'};
+							border: 2px solid {resultColors ? resultColors.border + 'CC' : 'rgba(201, 168, 118, 0.7)'};
+							box-shadow: 0 0 10px {resultColors ? resultColors.glow + '60' : 'rgba(201, 168, 118, 0.25)'};
 						"
 					>
 						{#if resultColors}
@@ -188,8 +188,8 @@
 									</div>
 								</div>
 								<div
-									class="fade-in-up truncate px-1 text-center text-xs font-semibold"
-									style="color: {colors.primary}; max-width: 100%;"
+									class="fade-in-up px-1 text-center text-xs font-semibold leading-tight"
+									style="color: {colors.primary}; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto; line-height: 1.2;"
 								>
 									{slotResults[reelIndex].title}
 								</div>
@@ -345,13 +345,10 @@
 					{@const colors = getCategoryColors(button.category)}
 					<a
 						href={resolve(button.href as `/${string}`)}
-						class="inline-block rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg md:px-6 md:py-3 md:text-base"
+						class="azaria-btn text-sm md:text-base"
 						style="
-							border: 2px solid {colors.border};
-							color: {colors.primary};
-							background: {colors.bg};
-							box-shadow: 0 0 10px {colors.glow};
-							text-decoration: none;
+							border-color: {colors.border};
+							box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 6px {colors.glow};
 						"
 					>
 						<Icon
