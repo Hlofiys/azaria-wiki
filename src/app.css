@@ -9,6 +9,10 @@ body {
 		radial-gradient(circle at 50% 100%, rgba(93, 173, 226, 0.01) 0%, transparent 60%);
 	color: #d0d0d0;
 	font-family: 'Lora', serif;
+	/* Ensure consistent color rendering */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
 }
 
 h1,
@@ -331,6 +335,11 @@ a:hover {
 html {
 	-webkit-text-size-adjust: 100%;
 	-ms-text-size-adjust: 100%;
+	/* Force consistent color rendering across devices */
+	-webkit-color-profile: sRGB;
+	color-profile: sRGB;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* Prevent horizontal scrolling on mobile */
