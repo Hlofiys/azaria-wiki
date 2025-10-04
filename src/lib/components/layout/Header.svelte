@@ -44,7 +44,7 @@
 	<div class="container mx-auto px-4 py-4">
 		<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 			<!-- Logo and Title -->
-			<div class="flex items-center space-x-4">
+			<div class="flex items-center justify-center space-x-4 md:justify-start">
 				<a
 					href={resolve('/')}
 					class="flex items-center space-x-3 transition-opacity hover:opacity-80"
@@ -91,7 +91,7 @@
 			</nav>
 
 			<!-- Search and Random -->
-			<div class="flex items-center space-x-2 md:space-x-4">
+			<div class="flex items-center justify-center space-x-2 md:justify-end md:space-x-4">
 				<form on:submit|preventDefault={handleSearch} class="flex items-center">
 					<input
 						type="text"

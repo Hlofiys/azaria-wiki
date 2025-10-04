@@ -11,7 +11,17 @@ const config = {
 		adapter: adapter({
 			// Fallback for SPA mode
 			fallback: 'index.html'
-		})
+		}),
+		prerender: {
+			handleHttpError: ({ path, referrer, message }) => {
+				// Ignore favicon.ico 404 errors
+				if (path === '/favicon.ico') {
+					return;
+				}
+				// Throw for other errors
+				throw new Error(message);
+			}
+		}
 	},
 	extensions: ['.svelte', '.svx']
 };
