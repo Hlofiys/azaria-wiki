@@ -3,16 +3,64 @@
 	import Header from '$lib/components/layout/Header.svelte';
 	import InstallPrompt from '$lib/components/pwa/InstallPrompt.svelte';
 	import PWAManager from '$lib/components/pwa/PWAManager.svelte';
+	import PageTransition from '$lib/components/ui/PageTransition.svelte';
 	import { initializeClientData } from '$lib/client-data.js';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { isFullscreen } from '$lib/stores';
+	import type { Snippet } from 'svelte';
 	import type { LayoutServerData } from './$types';
 
-	let { children, data }: { children: unknown; data: LayoutServerData } = $props();
+	let { children, data }: { children: Snippet; data: LayoutServerData } = $props();
+	let mainContent: HTMLElement;
+	let visible = $state(false);
+	let showHeader = $state(true);
 
 	onMount(() => {
-		// Initialize client data globally
 		if (data?.allEntries) {
 			initializeClientData(data.allEntries);
+		}
+
+		const header = document.getElementById('main-header');
+		function adjustPadding() {
+			if (header && mainContent) {
+				const headerHeight = header.offsetHeight;
+				mainContent.style.paddingTop = `${headerHeight + 32}px`;
+			}
+		}
+
+		adjustPadding();
+		window.addEventListener('resize', adjustPadding);
+
+		const observer = new MutationObserver(adjustPadding);
+		if (header) {
+			observer.observe(header, { attributes: true, childList: true, subtree: true });
+		}
+
+		const unsubscribe = isFullscreen.subscribe((value) => {
+			showHeader = !value;
+		});
+
+		return () => {
+			window.removeEventListener('resize', adjustPadding);
+			if (header) {
+				observer.disconnect();
+			}
+			unsubscribe();
+		};
+	});
+
+	const imageUrl = $derived($page.data.entry?.metadata?.image);
+
+	$effect(() => {
+		if (imageUrl) {
+			const img = new Image();
+			img.src = imageUrl;
+			img.onload = () => {
+				visible = true;
+			};
+		} else {
+			visible = false;
 		}
 	});
 </script>
@@ -23,14 +71,22 @@
 	<link rel="apple-touch-icon" href="/favicon.svg" />
 </svelte:head>
 
-<div style="min-height: 100vh; background-color: #1a1a1a;">
-	<Header />
+<div class="background-container">
+	<div
+		class="background-image"
+		class:visible
+		style:background-image={imageUrl ? `url(${imageUrl})` : 'none'}
+	/>
+	{#if showHeader}
+		<Header />
+	{/if}
 
-	<main class="container mx-auto px-4 py-8">
-		{@render children?.()}
-	</main>
+	<PageTransition>
+		<main bind:this={mainContent} class="container mx-auto px-4 pb-8">
+			{@render children()}
+		</main>
+	</PageTransition>
 
-	<!-- PWA Components -->
 	<PWAManager />
 	<InstallPrompt />
 
@@ -47,3 +103,28 @@
 		</div>
 	</footer>
 </div>
+
+<style>
+	.background-container {
+		min-height: 100vh;
+		background-color: #1a1a1a;
+		position: relative;
+	}
+
+	.background-image {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100vh;
+		background-size: cover;
+		background-position: center;
+		z-index: -1;
+		opacity: 0;
+		transition: opacity 0.5s ease-in-out;
+	}
+
+	.background-image.visible {
+		opacity: 0.1;
+	}
+</style>

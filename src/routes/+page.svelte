@@ -5,11 +5,21 @@
 	import type { EntryListItem } from '$lib/server/lore-parser';
 	import type { CategoryType } from '$lib/icons';
 	import type { PageData } from './$types';
+	import LoadingAnimations from '$lib/components/ui/LoadingAnimations.svelte';
+	import { onMount } from 'svelte';
 
 	export let data: PageData;
 
 	let isSpinning = false;
 	let slotResults: EntryListItem[] = [];
+	let isLoaded = false;
+
+	onMount(() => {
+		// Trigger loading animation
+		setTimeout(() => {
+			isLoaded = true;
+		}, 200);
+	});
 
 	// Slot machine functionality
 	async function spinSlotMachine() {
@@ -49,73 +59,76 @@
 
 <div class="mx-auto max-w-7xl">
 	<!-- Hero Section -->
-	<div class="relative mb-12 text-center">
-		<!-- Floating decorative particles -->
-		<div class="pointer-events-none absolute inset-0 overflow-hidden">
-			<div
-				class="floating-particle absolute top-10 left-10 text-yellow-500 opacity-20"
-				style="animation-delay: 0s;"
-			>
-				✨
+	<LoadingAnimations type="fade" delay={0} show={isLoaded}>
+		<div class="relative mb-12 text-center">
+			<!-- Floating decorative particles -->
+			<div class="pointer-events-none absolute inset-0 overflow-hidden">
+				<div
+					class="floating-particle absolute top-10 left-10 text-yellow-500 opacity-20"
+					style="animation-delay: 0s;"
+				>
+					✨
+				</div>
+				<div
+					class="floating-particle absolute top-20 right-20 text-blue-500 opacity-20"
+					style="animation-delay: 1s;"
+				>
+					🏰
+				</div>
+				<div
+					class="floating-particle absolute bottom-20 left-20 text-red-500 opacity-20"
+					style="animation-delay: 2s;"
+				>
+					⚔️
+				</div>
+				<div
+					class="floating-particle absolute right-10 bottom-10 text-purple-500 opacity-20"
+					style="animation-delay: 3s;"
+				>
+					🔮
+				</div>
 			</div>
-			<div
-				class="floating-particle absolute top-20 right-20 text-blue-500 opacity-20"
-				style="animation-delay: 1s;"
-			>
-				🏰
-			</div>
-			<div
-				class="floating-particle absolute bottom-20 left-20 text-red-500 opacity-20"
-				style="animation-delay: 2s;"
-			>
-				⚔️
-			</div>
-			<div
-				class="floating-particle absolute right-10 bottom-10 text-purple-500 opacity-20"
-				style="animation-delay: 3s;"
-			>
-				🔮
-			</div>
-		</div>
 
-		<h1
-			class="font-heading text-azaria-gold relative z-10 mb-4 text-center text-3xl sm:text-4xl md:mb-6 md:text-5xl lg:text-7xl"
-		>
-			<div class="flex flex-col items-center justify-center gap-2 sm:flex-row md:gap-4">
-				<Icon
-					icon={getUIIcon('slot')}
-					class="icon-bounce gentle-glow"
-					style="vertical-align: middle;"
-				/>
-				<span>Добро пожаловать в Азарию</span>
+			<h1
+				class="font-heading text-azaria-gold relative z-10 mb-4 text-center text-3xl sm:text-4xl md:mb-6 md:text-5xl lg:text-7xl"
+			>
+				<div class="flex flex-col items-center justify-center gap-2 sm:flex-row md:gap-4">
+					<Icon
+						icon={getUIIcon('slot')}
+						class="icon-bounce gentle-glow"
+						style="vertical-align: middle;"
+					/>
+					<span>Добро пожаловать в Азарию</span>
+				</div>
+			</h1>
+			<p
+				class="text-azaria-text/80 font-body relative z-10 mx-auto mb-6 max-w-3xl px-4 text-center text-lg md:mb-8 md:text-xl lg:text-2xl"
+			>
+				Погрузитесь в мир, где средневековье встречается с философией азарта, где удача правит
+				королевствами, а деп становится искусством.
+			</p>
+			<div
+				class="text-azaria-text/60 relative z-10 flex flex-wrap justify-center gap-2 px-4 text-xs md:gap-4 md:text-sm"
+			>
+				<span class="icon-bounce"
+					><Icon icon={getUIIcon('book')} class="mr-1 inline" /> {data.totalEntries} статей</span
+				>
+				<span class="icon-bounce"
+					><Icon icon={getCategoryIcon('characters')} class="mr-1 inline" style="color: #FFD700;" />
+					Персонажи</span
+				>
+				<span class="icon-bounce"
+					><Icon icon={getCategoryIcon('locations')} class="mr-1 inline" style="color: #5DADE2;" /> Локации</span
+				>
+				<span class="icon-bounce"
+					><Icon icon={getCategoryIcon('factions')} class="mr-1 inline" style="color: #E74C3C;" /> Фракции</span
+				>
+				<span class="icon-bounce"
+					><Icon icon={getCategoryIcon('artifacts')} class="mr-1 inline" style="color: #AF7AC5;" /> Артефакты</span
+				>
 			</div>
-		</h1>
-		<p
-			class="text-azaria-text/80 font-body relative z-10 mx-auto mb-6 max-w-3xl px-4 text-center text-lg md:mb-8 md:text-xl lg:text-2xl"
-		>
-			Погрузитесь в мир, где средневековье встречается с философией азарта, где удача правит
-			королевствами, а деп становится искусством.
-		</p>
-		<div
-			class="text-azaria-text/60 relative z-10 flex flex-wrap justify-center gap-2 px-4 text-xs md:gap-4 md:text-sm"
-		>
-			<span class="icon-bounce"
-				><Icon icon={getUIIcon('book')} class="mr-1 inline" /> {data.totalEntries} статей</span
-			>
-			<span class="icon-bounce"
-				><Icon icon={getCategoryIcon('characters')} class="mr-1 inline" style="color: #FFD700;" /> Персонажи</span
-			>
-			<span class="icon-bounce"
-				><Icon icon={getCategoryIcon('locations')} class="mr-1 inline" style="color: #5DADE2;" /> Локации</span
-			>
-			<span class="icon-bounce"
-				><Icon icon={getCategoryIcon('factions')} class="mr-1 inline" style="color: #E74C3C;" /> Фракции</span
-			>
-			<span class="icon-bounce"
-				><Icon icon={getCategoryIcon('artifacts')} class="mr-1 inline" style="color: #AF7AC5;" /> Артефакты</span
-			>
 		</div>
-	</div>
+	</LoadingAnimations>
 
 	<!-- Slot Machine of Fate -->
 	<div
@@ -252,48 +265,51 @@
 			</div>
 		</h2>
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
-			{#each categories as category (category.name)}
+			{#each categories as category, index (category.name)}
 				{@const colors = getCategoryColors(category.name)}
-				<a
-					href={resolve(`/${category.name}` as `/${string}`)}
-					class="group relative overflow-hidden rounded-lg transition-all duration-300 hover:scale-105"
-					style="
-						background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
-						border: 2px solid {colors.border}50;
-						box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px {colors.glow}40;
-					"
-				>
-					<!-- Animated background gradient -->
+				<LoadingAnimations type="slide" delay={index * 150} show={isLoaded}>
 					<div
-						class="absolute inset-0 opacity-10 transition-opacity duration-500 group-hover:opacity-20"
-						style="background: linear-gradient(135deg, {colors.bg} 0%, transparent 30%, {colors.bg} 70%, transparent 100%);"
-					></div>
+						class="group relative overflow-hidden rounded-lg transition-all duration-300 hover:scale-105"
+						style="
+							background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
+							border: 2px solid {colors.border}50;
+							box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px {colors.glow}40;
+						"
+					>
+						<a href={resolve(`/${category.name}` as `/${string}`)} class="block h-full w-full">
+							<!-- Animated background gradient -->
+							<div
+								class="absolute inset-0 opacity-10 transition-opacity duration-500 group-hover:opacity-20"
+								style="background: linear-gradient(135deg, {colors.bg} 0%, transparent 30%, {colors.bg} 70%, transparent 100%);"
+							></div>
 
-					<!-- Glowing border effect on hover -->
-					<div
-						class="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-						style="box-shadow: inset 0 0 20px {colors.glow};"
-					></div>
+							<!-- Glowing border effect on hover -->
+							<div
+								class="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+								style="box-shadow: inset 0 0 20px {colors.glow};"
+							></div>
 
-					<div class="relative z-10 p-4 text-center md:p-6">
-						<Icon
-							icon={getCategoryIcon(category.name)}
-							class="mb-2 text-3xl transition-all duration-300 group-hover:scale-110 md:mb-3 md:text-4xl"
-							style="color: {colors.primary}; filter: drop-shadow(0 0 8px {colors.glow});"
-						/>
-						<h3
-							class="font-heading mb-2 text-lg transition-all duration-300 md:text-xl"
-							style="color: {colors.primary}; text-shadow: 0 0 4px {colors.glow};"
+							<div class="relative z-10 p-4 text-center md:p-6">
+								<Icon
+									icon={getCategoryIcon(category.name)}
+									class="mb-2 text-3xl transition-all duration-300 group-hover:scale-110 md:mb-3 md:text-4xl"
+									style="color: {colors.primary}; filter: drop-shadow(0 0 8px {colors.glow});"
+								/>
+								<h3
+									class="font-heading mb-2 text-lg transition-all duration-300 md:text-xl"
+									style="color: {colors.primary}; text-shadow: 0 0 4px {colors.glow};"
+								>
+									{category.title}
+								</h3>
+								<p
+									class="text-azaria-text/70 font-body group-hover:text-azaria-text/90 text-sm transition-colors duration-300"
+								>
+									{category.description}
+								</p>
+							</div></a
 						>
-							{category.title}
-						</h3>
-						<p
-							class="text-azaria-text/70 font-body group-hover:text-azaria-text/90 text-sm transition-colors duration-300"
-						>
-							{category.description}
-						</p>
 					</div>
-				</a>
+				</LoadingAnimations>
 			{/each}
 		</div>
 	</div>
@@ -307,8 +323,10 @@
 			</div>
 		</h2>
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
-			{#each data.featuredEntries as entry (entry.slug)}
-				<LoreCard {entry} showCategory={true} />
+			{#each data.featuredEntries as entry, index (entry.slug)}
+				<LoadingAnimations type="fade" delay={600 + index * 200} show={isLoaded}>
+					<LoreCard {entry} showCategory={true} />
+				</LoadingAnimations>
 			{/each}
 		</div>
 	</div>

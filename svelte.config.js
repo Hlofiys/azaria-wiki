@@ -79,8 +79,6 @@ const config = {
 	compilerOptions: {
 		// Enable dev mode optimizations in development
 		dev: process.env.NODE_ENV === 'development',
-		// Optimize for production
-		hydratable: true,
 		// Use compatibility API instead of legacy
 		compatibility: {
 			componentApi: 4

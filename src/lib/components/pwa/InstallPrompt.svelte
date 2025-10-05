@@ -184,7 +184,8 @@
 						style="color: rgba(243, 233, 210, 0.8);"
 					>
 						{#if isIOS}
-							Добавьте в закладки Safari и выберите "На экран «Домой»" для быстрого доступа
+							Нажмите <Icon icon="mdi:export-variant" class="mx-1 inline h-4 w-4" /> в Safari, затем
+							"На экран «Домой»"
 						{:else}
 							Установите приложение для быстрого доступа и работы в автономном режиме
 						{/if}
@@ -215,56 +216,9 @@
 	</div>
 {/if}
 
-<!-- iOS Install Instructions -->
-{#if isIOS && showInstallPrompt && !isInstalled}
-	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-		role="dialog"
-		aria-modal="true"
-	>
-		<div
-			class="azaria-card max-w-md rounded-lg p-6"
-			style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);"
-		>
-			<div class="mb-4 text-center">
-				<Icon icon="mdi:apple" class="mx-auto mb-2 h-12 w-12" style="color: #c9a876;" />
-				<h3 class="font-heading text-xl font-semibold" style="color: #c9a876;">Установка на iOS</h3>
-			</div>
+<!-- iOS Install Instructions - Only small notification, no full screen modal -->
 
-			<div class="space-y-3 text-sm" style="color: rgba(243, 233, 210, 0.8);">
-				<div class="flex items-center gap-3">
-					<div
-						class="bg-azaria-gold/20 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-						style="color: #c9a876;"
-					>
-						1
-					</div>
-					<span>Нажмите кнопку "Поделиться" в Safari</span>
-				</div>
-				<div class="flex items-center gap-3">
-					<div
-						class="bg-azaria-gold/20 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-						style="color: #c9a876;"
-					>
-						2
-					</div>
-					<span>Выберите "На экран «Домой»"</span>
-				</div>
-				<div class="flex items-center gap-3">
-					<div
-						class="bg-azaria-gold/20 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
-						style="color: #c9a876;"
-					>
-						3
-					</div>
-					<span>Нажмите "Добавить"</span>
-				</div>
-			</div>
-
-			<button class="azaria-btn mt-6 w-full" on:click={dismissPrompt}> Понятно </button>
-		</div>
-	</div>
-{/if}
+<!-- Full screen iOS modal removed -->
 
 <style>
 	.azaria-card {

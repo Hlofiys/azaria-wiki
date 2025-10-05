@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Icon, getCategoryIcon, getCategoryColors } from '$lib/icons';
 	import { resolve } from '$app/paths';
+	import { isFullscreen } from '$lib/stores';
 	import type { EntryMetadata, EntryListItem } from '$lib/server/lore-parser';
 
 	export let entry: EntryMetadata;
@@ -9,21 +10,106 @@
 	$: colors = getCategoryColors(entry.category);
 
 	let showImageModal = false;
+	let imageZoom = 1;
+	let initialImageZoom = 1;
+	let isDragging = false;
+	let dragStart = { x: 0, y: 0 };
+	let imagePosition = { x: 0, y: 0 };
+	let imageElement: HTMLImageElement;
 
 	function openImageModal() {
-		showImageModal = true;
-		document.body.style.overflow = 'hidden';
+		if (!entry.image) return;
+
+		const img = new Image();
+		img.src = entry.image;
+		img.onload = () => {
+			const imageWidth = img.naturalWidth;
+			const imageHeight = img.naturalHeight;
+
+			// Use a 10% margin around the image
+			const viewportWidth = window.innerWidth * 0.9;
+			const viewportHeight = window.innerHeight * 0.9;
+
+			const widthRatio = viewportWidth / imageWidth;
+			const heightRatio = viewportHeight / imageHeight;
+
+			// Set the initial zoom to fit the screen, but don't scale up small images
+			initialImageZoom = Math.min(widthRatio, heightRatio, 1);
+			imageZoom = initialImageZoom;
+			imagePosition = { x: 0, y: 0 };
+
+			showImageModal = true;
+			document.body.style.overflow = 'hidden';
+			isFullscreen.set(true);
+		};
 	}
 
 	function closeImageModal() {
 		showImageModal = false;
 		document.body.style.overflow = 'auto';
+		isFullscreen.set(false);
+		imagePosition = { x: 0, y: 0 };
+		// Reset zoom state for the next time the modal is opened
+		initialImageZoom = 1;
+		imageZoom = 1;
+	}
+
+	function handleImageWheel(event: WheelEvent) {
+		event.preventDefault();
+		const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
+		imageZoom = Math.max(0.5, Math.min(5, imageZoom * zoomFactor));
+	}
+
+	function handleImageMouseDown(event: MouseEvent) {
+		if (imageZoom > 1) {
+			isDragging = true;
+			dragStart = { x: event.clientX - imagePosition.x, y: event.clientY - imagePosition.y };
+			event.preventDefault();
+		}
+	}
+
+	function handleImageMouseMove(event: MouseEvent) {
+		if (isDragging && imageZoom > 1) {
+			imagePosition = {
+				x: event.clientX - dragStart.x,
+				y: event.clientY - dragStart.y
+			};
+		}
+	}
+
+	function handleImageMouseUp() {
+		isDragging = false;
+	}
+
+	function handleImageDoubleClick() {
+		// If at initial zoom, zoom in. Otherwise, reset.
+		if (imageZoom === initialImageZoom) {
+			imageZoom = Math.min(initialImageZoom * 2, 5); // Zoom in, but not more than 5x
+		} else {
+			imageZoom = initialImageZoom;
+			imagePosition = { x: 0, y: 0 };
+		}
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			closeImageModal();
 		}
+	}
+
+	function handleBackgroundClick(event: MouseEvent) {
+		// Close modal when clicking outside the image
+		const target = event.target as HTMLElement;
+		
+		// Don't close if clicking on image, controls, or buttons
+		if (target.tagName === 'IMG' || 
+			target.tagName === 'BUTTON' || 
+			target.closest('button') || 
+			target.closest('[role="button"]')) {
+			return;
+		}
+		
+		closeImageModal();
 	}
 </script>
 
@@ -77,7 +163,10 @@
 							loading="lazy"
 							on:error={(e) => {
 								// Hide image if it fails to load
-								e.target.style.display = 'none';
+								const target = e.target as HTMLImageElement;
+								if (target && target.style) {
+									target.style.display = 'none';
+								}
 							}}
 						/>
 					</button>
@@ -278,41 +367,127 @@
 <!-- Image Modal -->
 {#if showImageModal && entry.image}
 	<div
-		class="bg-opacity-80 fixed inset-0 z-50 overflow-auto bg-black p-4"
-		on:click={closeImageModal}
+		class="fixed inset-0 z-50 flex items-center justify-center"
+		on:click={handleBackgroundClick}
 		on:keydown={handleKeydown}
 		role="dialog"
 		aria-modal="true"
 		aria-label="Увеличенное изображение {entry.title}"
 		tabindex="-1"
+		style="
+			position: fixed !important;
+			top: 0 !important;
+			left: 0 !important;
+			right: 0 !important;
+			bottom: 0 !important;
+			width: 100vw !important;
+			height: 100vh !important;
+			background-color: rgba(0, 0, 0, 0.9) !important;
+			backdrop-filter: blur(8px) !important;
+			-webkit-backdrop-filter: blur(8px) !important;
+			z-index: 999999 !important;
+		"
 	>
-		<div class="flex min-h-full items-center justify-center">
-			<div class="relative max-w-screen-lg">
+		<!-- Close button -->
+		<button
+			on:click={closeImageModal}
+			class="absolute top-6 right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
+			style="background-color: rgba(0, 0, 0, 0.7);"
+			aria-label="Закрыть изображение"
+			title="Закрыть изображение"
+		>
+			<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M6 18L18 6M6 6l12 12"
+				></path>
+			</svg>
+		</button>
+
+		<!-- Centered image container with margins -->
+		<div
+			class="relative flex items-center justify-center p-8 md:p-12 lg:p-16"
+			style="width: 100vw; height: 100vh;"
+			on:mousemove={handleImageMouseMove}
+			on:mouseup={handleImageMouseUp}
+			role="presentation"
+		>
+			<!-- Zoomable image -->
+			<div class="relative max-h-full max-w-full overflow-hidden">
 				<button
-					on:click={closeImageModal}
-					class="bg-opacity-70 hover:bg-opacity-90 absolute -top-2 -right-2 z-10 rounded-full bg-black p-2 text-white"
-					style="color: #c9a876;"
-					aria-label="Закрыть изображение"
-					title="Закрыть изображение"
+					type="button"
+					class="relative block max-h-full max-w-full border-0 bg-transparent p-0 transition-transform duration-200 select-none focus:outline-none"
+					style="
+						transform: scale({imageZoom}) translate({imagePosition.x / imageZoom}px, {imagePosition.y / imageZoom}px);
+						cursor: {imageZoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'};
+						display: flex;
+						align-items: center;
+						justify-content: center;
+					"
+					on:wheel={handleImageWheel}
+					on:mousedown={handleImageMouseDown}
+					on:dblclick={handleImageDoubleClick}
+					on:click={(e) => {
+						e.stopPropagation();
+						if (imageZoom === initialImageZoom) {
+							closeImageModal();
+						}
+					}}
+					aria-label="Изображение. Колесико мыши для масштабирования, двойной клик для увеличения, клик для закрытия"
 				>
-					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						></path>
-					</svg>
-				</button>
-				<div class="rounded-lg" style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">
 					<img
+						bind:this={imageElement}
 						src={entry.image}
 						alt={entry.title}
-						class="max-w-full rounded-lg object-contain"
-						style="max-height: 90vh; width: auto; height: auto;"
+						class="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
+						style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);"
+						draggable="false"
 					/>
-				</div>
+				</button>
 			</div>
+		</div>
+
+		<!-- Zoom controls -->
+		<div class="absolute bottom-6 right-6 z-[100] flex gap-2">
+			<button
+				type="button"
+				class="flex h-10 w-10 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
+				style="background-color: rgba(0, 0, 0, 0.7);"
+				on:click={(e) => {
+					e.stopPropagation();
+					imageZoom = Math.max(0.5, imageZoom * 0.8);
+				}}
+				aria-label="Уменьшить"
+			>
+				−
+			</button>
+			<button
+				type="button"
+				class="flex h-10 w-10 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
+				style="background-color: rgba(0, 0, 0, 0.7);"
+				on:click={(e) => {
+					e.stopPropagation();
+					imageZoom = Math.min(5, imageZoom * 1.25);
+				}}
+				aria-label="Увеличить"
+			>
+				+
+			</button>
+			<button
+				type="button"
+				class="flex h-10 w-10 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
+				style="background-color: rgba(0, 0, 0, 0.7);"
+				on:click={(e) => {
+					e.stopPropagation();
+					imageZoom = initialImageZoom;
+					imagePosition = { x: 0, y: 0 };
+				}}
+				aria-label="Сбросить масштаб"
+			>
+				⌂
+			</button>
 		</div>
 	</div>
 {/if}
