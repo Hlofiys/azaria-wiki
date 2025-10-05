@@ -25,11 +25,27 @@
 		// Detect iOS
 		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-		// For iOS, show install prompt immediately if not installed
-		if (isIOS && !isInstalled && !sessionStorage.getItem('pwa-install-dismissed')) {
-			setTimeout(() => {
-				showInstallPrompt = true;
-			}, 5000); // Show after 5 seconds on iOS
+		// For iOS, show install prompt with smart timing
+		if (isIOS && !isInstalled) {
+			const lastDismissed = localStorage.getItem('ios-pwa-dismissed');
+			const now = Date.now();
+
+			if (!lastDismissed) {
+				// First visit - show after 5 seconds
+				setTimeout(() => {
+					showInstallPrompt = true;
+				}, 5000);
+			} else {
+				// Previously dismissed - show again after 24 hours
+				const dismissedTime = parseInt(lastDismissed);
+				const hoursPassed = (now - dismissedTime) / (1000 * 60 * 60);
+
+				if (hoursPassed >= 24) {
+					setTimeout(() => {
+						showInstallPrompt = true;
+					}, 30000); // Show after 30 seconds on return visit
+				}
+			}
 		}
 
 		// Listen for install prompt
@@ -60,14 +76,7 @@
 		window.addEventListener('appinstalled', handleAppInstalled);
 		navigator.serviceWorker?.addEventListener('message', handleSWMessage);
 
-		// Listen for iOS install button click
-		const handleIOSInstall = () => {
-			if (isIOS && !isInstalled) {
-				showInstallPrompt = true;
-			}
-		};
-
-		window.addEventListener('show-ios-install', handleIOSInstall);
+		// No manual trigger needed - iOS prompts are automatic only
 
 		// Auto-show prompt after some time if not installed (mobile only)
 		const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -85,7 +94,6 @@
 			window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 			window.removeEventListener('appinstalled', handleAppInstalled);
 			navigator.serviceWorker?.removeEventListener('message', handleSWMessage);
-			window.removeEventListener('show-ios-install', handleIOSInstall);
 		};
 	});
 
@@ -108,8 +116,14 @@
 
 	function dismissPrompt() {
 		showInstallPrompt = false;
-		// Don't show again for this session
-		sessionStorage.setItem('pwa-install-dismissed', 'true');
+
+		if (isIOS) {
+			// For iOS, remember dismissal for 24 hours
+			localStorage.setItem('ios-pwa-dismissed', Date.now().toString());
+		} else {
+			// For other platforms, session-only dismissal
+			sessionStorage.setItem('pwa-install-dismissed', 'true');
+		}
 	}
 
 	// Check if user already dismissed this session on mount

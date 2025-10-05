@@ -7,7 +7,6 @@
 	import type { CategoryType } from '$lib/icons';
 	import { getRandomEntry } from '$lib/client-data.js';
 	import InstallButton from '$lib/components/pwa/InstallButton.svelte';
-	import IOSInstallButton from '$lib/components/pwa/IOSInstallButton.svelte';
 
 	let searchQuery = '';
 
@@ -106,9 +105,8 @@
 
 			<!-- Search, Install, and Actions -->
 			<div class="flex items-center justify-center space-x-2 md:justify-end md:space-x-4">
-				<!-- Install Buttons -->
+				<!-- Install Button -->
 				<InstallButton />
-				<IOSInstallButton />
 				<form on:submit|preventDefault={handleSearch} class="flex items-center">
 					<input
 						type="text"
