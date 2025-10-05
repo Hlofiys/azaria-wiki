@@ -6,6 +6,7 @@
 	import { getCategoryColors, getCategoryIcon } from '$lib/icons';
 	import type { CategoryType } from '$lib/icons';
 	import { getRandomEntry } from '$lib/client-data.js';
+	import InstallButton from '$lib/components/pwa/InstallButton.svelte';
 
 	let searchQuery = '';
 
@@ -72,26 +73,40 @@
 					{@const isActive = $page.url.pathname.startsWith(item.href)}
 					<a
 						href={resolve(item.href as `/${string}`)}
-						class="nav-link rounded px-2 py-1 transition-all duration-300"
+						class="nav-link hover:bg-opacity-10 rounded px-2 py-1 transition-all duration-300 hover:scale-105"
 						class:active={isActive}
+						class:nav-active={isActive}
 						style="
 							color: {isActive ? colors.primary : '#d0d0d0'};
 							text-shadow: {isActive ? `0 0 4px ${colors.glow}` : 'none'};
+							--hover-bg: {colors.bg};
 						"
+						on:mouseenter={(e) => {
+							e.currentTarget.style.backgroundColor = colors.bg;
+							e.currentTarget.style.boxShadow = `0 0 8px ${colors.glow}`;
+						}}
+						on:mouseleave={(e) => {
+							if (!isActive) {
+								e.currentTarget.style.backgroundColor = 'transparent';
+								e.currentTarget.style.boxShadow = 'none';
+							}
+						}}
 					>
 						<Icon
 							icon={getCategoryIcon(item.category)}
 							width="16"
-							class="mr-1 inline"
-							style="color: {isActive ? colors.primary : colors.secondary};"
+							class="mr-1 inline transition-colors duration-150"
+							style="color: {isActive ? colors.primary : colors.secondary} !important;"
 						/>
 						{item.label}
 					</a>
 				{/each}
 			</nav>
 
-			<!-- Search and Random -->
+			<!-- Search, Install, and Actions -->
 			<div class="flex items-center justify-center space-x-2 md:justify-end md:space-x-4">
+				<!-- Install Button -->
+				<InstallButton />
 				<form on:submit|preventDefault={handleSearch} class="flex items-center">
 					<input
 						type="text"
@@ -132,19 +147,32 @@
 					{@const isActive = $page.url.pathname.startsWith(item.href)}
 					<a
 						href={resolve(item.href as `/${string}`)}
-						class="nav-link-mobile flex flex-col items-center justify-center p-2 transition-all duration-300"
+						class="nav-link-mobile flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105"
+						class:active={isActive}
 						style="
 							color: {isActive ? colors.primary : '#d0d0d0'};
 							border: 1px solid {isActive ? colors.border : 'rgba(201, 168, 118, 0.2)'};
 							background: {isActive ? colors.bg : 'transparent'};
 							border-radius: 0.375rem;
 						"
+						on:mouseenter={(e) => {
+							e.currentTarget.style.backgroundColor = colors.bg;
+							e.currentTarget.style.borderColor = colors.border;
+							e.currentTarget.style.boxShadow = `0 0 8px ${colors.glow}`;
+						}}
+						on:mouseleave={(e) => {
+							if (!isActive) {
+								e.currentTarget.style.backgroundColor = 'transparent';
+								e.currentTarget.style.borderColor = 'rgba(201, 168, 118, 0.2)';
+								e.currentTarget.style.boxShadow = 'none';
+							}
+						}}
 					>
 						<Icon
 							icon={getCategoryIcon(item.category)}
 							width="16"
-							class="mb-1"
-							style="color: {isActive ? colors.primary : colors.secondary};"
+							class="mb-1 transition-colors duration-150"
+							style="color: {isActive ? colors.primary : colors.secondary} !important;"
 						/>
 						<span class="text-center">{item.label}</span>
 					</a>
@@ -157,7 +185,10 @@
 <style>
 	.nav-link {
 		color: #d0d0d0;
-		transition: color 0.3s ease;
+		transition:
+			color 0.15s ease,
+			background-color 0.3s ease,
+			box-shadow 0.3s ease;
 		font-family: 'Lora', serif;
 	}
 
@@ -170,9 +201,22 @@
 		text-shadow: 0 0 3px rgba(201, 168, 118, 0.3);
 	}
 
+	/* Ensure icon colors update instantly */
+	.nav-link :global(svg) {
+		transition: color 0.1s ease !important;
+	}
+
+	.nav-link.active :global(svg) {
+		transition: none !important;
+	}
+
 	.nav-link-mobile {
 		color: #d0d0d0;
-		transition: color 0.3s ease;
+		transition:
+			color 0.15s ease,
+			background-color 0.3s ease,
+			border-color 0.3s ease,
+			box-shadow 0.3s ease;
 		font-family: 'Lora', serif;
 		text-align: center;
 		padding: 0.5rem 0.25rem;
@@ -181,5 +225,14 @@
 
 	.nav-link-mobile:hover {
 		color: #c9a876;
+	}
+
+	/* Ensure mobile icon colors update instantly */
+	.nav-link-mobile :global(svg) {
+		transition: color 0.1s ease !important;
+	}
+
+	.nav-link-mobile.active :global(svg) {
+		transition: none !important;
 	}
 </style>

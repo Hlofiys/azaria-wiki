@@ -1,12 +1,14 @@
 <script lang="ts">
 	import '../app.css';
 	import Header from '$lib/components/layout/Header.svelte';
+	import InstallPrompt from '$lib/components/pwa/InstallPrompt.svelte';
+	import PWAManager from '$lib/components/pwa/PWAManager.svelte';
 	import { initializeClientData } from '$lib/client-data.js';
 	import { onMount } from 'svelte';
 	import type { LayoutServerData } from './$types';
 
-	let { children, data }: { children: any, data: LayoutServerData } = $props();
-	
+	let { children, data }: { children: unknown; data: LayoutServerData } = $props();
+
 	onMount(() => {
 		// Initialize client data globally
 		if (data?.allEntries) {
@@ -27,6 +29,10 @@
 	<main class="container mx-auto px-4 py-8">
 		{@render children?.()}
 	</main>
+
+	<!-- PWA Components -->
+	<PWAManager />
+	<InstallPrompt />
 
 	<footer class="azaria-card border-t-2" style="border-top-color: #c9a876; margin-top: 4rem;">
 		<div class="container mx-auto px-4 py-8 text-center">

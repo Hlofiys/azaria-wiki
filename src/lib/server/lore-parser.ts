@@ -71,42 +71,98 @@ export interface FrontmatterResult {
 
 const LORE_CONTENT_DIR = path.join(process.cwd(), 'src/lib/lore-content');
 
-// Load entity map for wiki linking
+// Enhanced caching system for server-side operations
+const serverCache = new Map<string, unknown>();
+const cacheTimestamps = new Map<string, number>();
+const CACHE_TTL = 1000 * 60 * 5; // 5 minutes cache in development
+
+// Load entity map for wiki linking with caching
 let entityMap: Record<string, EntityMapEntry> = {};
 try {
 	const entityMapPath = path.join(process.cwd(), 'src/lib/entity-map.json');
-	entityMap = JSON.parse(fs.readFileSync(entityMapPath, 'utf-8'));
+	const cacheKey = 'entity-map';
+
+	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
+		entityMap = serverCache.get(cacheKey);
+	} else {
+		entityMap = JSON.parse(fs.readFileSync(entityMapPath, 'utf-8'));
+		serverCache.set(cacheKey, entityMap);
+		cacheTimestamps.set(cacheKey, Date.now());
+	}
 } catch {
 	console.warn('Entity map not found, wiki linking will be disabled');
 }
 
+// Cache validation helper
+function isValidCache(key: string): boolean {
+	const timestamp = cacheTimestamps.get(key);
+	if (!timestamp) return false;
+	return Date.now() - timestamp < CACHE_TTL;
+}
+
+// Clear expired cache entries
+function clearExpiredCache(): void {
+	const now = Date.now();
+	for (const [key, timestamp] of cacheTimestamps.entries()) {
+		if (now - timestamp > CACHE_TTL) {
+			serverCache.delete(key);
+			cacheTimestamps.delete(key);
+		}
+	}
+}
+
 /**
- * Get all entries for a specific category
+ * Get all entries for a specific category (optimized with caching)
  * @param category - The category name (characters, locations, etc.)
  * @returns Array of entry objects with metadata
  */
 export function getAllEntries(category: CategoryType): EntryListItem[] {
+	const cacheKey = `category-${category}`;
+
+	// Check cache first
+	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
+		return serverCache.get(cacheKey);
+	}
+
 	const categoryDir = path.join(LORE_CONTENT_DIR, category);
 
 	if (!fs.existsSync(categoryDir)) {
-		return [];
+		const emptyResult: EntryListItem[] = [];
+		serverCache.set(cacheKey, emptyResult);
+		cacheTimestamps.set(cacheKey, Date.now());
+		return emptyResult;
 	}
 
-	const files = fs.readdirSync(categoryDir).filter((file) => file.endsWith('.md'));
+	try {
+		const files = fs.readdirSync(categoryDir).filter((file) => file.endsWith('.md'));
 
-	return files
-		.map((file) => {
-			const filePath = path.join(categoryDir, file);
-			const content = fs.readFileSync(filePath, 'utf-8');
-			const metadata = extractFrontmatter(content);
+		const entries = files
+			.map((file) => {
+				const filePath = path.join(categoryDir, file);
+				const content = fs.readFileSync(filePath, 'utf-8');
+				const metadata = extractFrontmatter(content);
 
-			return {
-				title: metadata.title || 'Untitled',
-				...metadata,
-				slug: path.basename(file, '.md'),
-				category
-			} as EntryListItem;
-		});
+				return {
+					title: metadata.title || 'Untitled',
+					...metadata,
+					slug: path.basename(file, '.md'),
+					category
+				} as EntryListItem;
+			})
+			.sort((a, b) => (a.title || '').localeCompare(b.title || '')); // Sort for consistent ordering
+
+		// Cache the result
+		serverCache.set(cacheKey, entries);
+		cacheTimestamps.set(cacheKey, Date.now());
+
+		return entries;
+	} catch (error) {
+		console.error(`Error loading entries for category ${category}:`, error);
+		const emptyResult: EntryListItem[] = [];
+		serverCache.set(cacheKey, emptyResult);
+		cacheTimestamps.set(cacheKey, Date.now());
+		return emptyResult;
+	}
 }
 
 /**
@@ -147,6 +203,16 @@ export async function getEntry(category: CategoryType, slug: string): Promise<En
  * @returns Array of all entries
  */
 export function getAllEntriesFlat(): EntryListItem[] {
+	const cacheKey = 'all-entries-flat';
+
+	// Check cache first
+	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
+		return serverCache.get(cacheKey);
+	}
+
+	// Clear expired cache periodically
+	clearExpiredCache();
+
 	const categories: CategoryType[] = [
 		'characters',
 		'locations',
@@ -155,14 +221,19 @@ export function getAllEntriesFlat(): EntryListItem[] {
 		'concepts',
 		'creatures'
 	];
-	const allEntries: EntryListItem[] = [];
 
-	categories.forEach((category) => {
-		const entries = getAllEntries(category);
-		allEntries.push(...entries);
-	});
+	try {
+		const allEntries = categories.flatMap((category) => getAllEntries(category));
 
-	return allEntries;
+		// Cache the result
+		serverCache.set(cacheKey, allEntries);
+		cacheTimestamps.set(cacheKey, Date.now());
+
+		return allEntries;
+	} catch (error) {
+		console.error('Error loading all entries:', error);
+		return [];
+	}
 }
 
 /**

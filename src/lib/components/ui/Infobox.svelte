@@ -278,7 +278,7 @@
 <!-- Image Modal -->
 {#if showImageModal && entry.image}
 	<div
-		class="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-80 p-4"
+		class="bg-opacity-80 fixed inset-0 z-50 overflow-auto bg-black p-4"
 		on:click={closeImageModal}
 		on:keydown={handleKeydown}
 		role="dialog"
@@ -290,13 +290,18 @@
 			<div class="relative max-w-screen-lg">
 				<button
 					on:click={closeImageModal}
-					class="absolute -right-2 -top-2 z-10 rounded-full bg-black bg-opacity-70 p-2 text-white hover:bg-opacity-90"
+					class="bg-opacity-70 hover:bg-opacity-90 absolute -top-2 -right-2 z-10 rounded-full bg-black p-2 text-white"
 					style="color: #c9a876;"
 					aria-label="Закрыть изображение"
 					title="Закрыть изображение"
 				>
 					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						></path>
 					</svg>
 				</button>
 				<div class="rounded-lg" style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);">

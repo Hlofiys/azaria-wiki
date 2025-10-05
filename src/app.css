@@ -58,14 +58,18 @@ a:hover {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 4px rgba(201, 168, 118, 0.2);
+	box-shadow:
+		0 2px 8px rgba(0, 0, 0, 0.4),
+		0 0 4px rgba(201, 168, 118, 0.2);
 	min-height: auto;
 }
 
 .azaria-btn:hover {
 	background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
 	transform: translateY(-1px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 6px rgba(201, 168, 118, 0.4);
+	box-shadow:
+		0 4px 12px rgba(0, 0, 0, 0.5),
+		0 0 6px rgba(201, 168, 118, 0.4);
 	color: #e6c190;
 	border-color: #e6c190;
 	text-shadow: 0 0 2px rgba(201, 168, 118, 0.2);
@@ -241,7 +245,7 @@ a:hover {
 	select {
 		min-height: 44px;
 	}
-	
+
 	/* Fix button alignment and sizing on mobile */
 	.azaria-btn {
 		min-height: 44px;
@@ -304,7 +308,7 @@ a:hover {
 	select {
 		min-height: 48px;
 	}
-	
+
 	/* Fix button alignment for very small screens */
 	.azaria-btn {
 		min-height: 48px;

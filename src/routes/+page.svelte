@@ -188,7 +188,7 @@
 									</div>
 								</div>
 								<div
-									class="fade-in-up px-1 text-center text-xs font-semibold leading-tight"
+									class="fade-in-up px-1 text-center text-xs leading-tight font-semibold"
 									style="color: {colors.primary}; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto; line-height: 1.2;"
 								>
 									{slotResults[reelIndex].title}

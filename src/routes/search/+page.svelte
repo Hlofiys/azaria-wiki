@@ -9,25 +9,25 @@
 	import type { EntryListItem } from '$lib/server/lore-parser';
 
 	export let data: PageData;
-	
+
 	let searchResults: EntryListItem[] = [];
 	let query = '';
-	
+
 	onMount(() => {
 		// Initialize client data with all entries
 		initializeClientData(data.allEntries);
-		
+
 		// Get query from URL - only in browser
 		if (typeof window !== 'undefined') {
 			query = $page.url.searchParams.get('q') || '';
-			
+
 			// Perform search if query exists
 			if (query.trim()) {
 				searchResults = searchEntries(query);
 			}
 		}
 	});
-	
+
 	// Reactive statement to update results when URL changes - only in browser
 	$: if (typeof window !== 'undefined' && $page.url.searchParams.get('q') !== query) {
 		query = $page.url.searchParams.get('q') || '';
