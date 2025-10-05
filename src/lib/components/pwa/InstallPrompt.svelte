@@ -25,6 +25,13 @@
 		// Detect iOS
 		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
+		// For iOS, show install prompt immediately if not installed
+		if (isIOS && !isInstalled && !sessionStorage.getItem('pwa-install-dismissed')) {
+			setTimeout(() => {
+				showInstallPrompt = true;
+			}, 5000); // Show after 5 seconds on iOS
+		}
+
 		// Listen for install prompt
 		const handleBeforeInstallPrompt = (e: Event) => {
 			e.preventDefault();
@@ -53,6 +60,15 @@
 		window.addEventListener('appinstalled', handleAppInstalled);
 		navigator.serviceWorker?.addEventListener('message', handleSWMessage);
 
+		// Listen for iOS install button click
+		const handleIOSInstall = () => {
+			if (isIOS && !isInstalled) {
+				showInstallPrompt = true;
+			}
+		};
+
+		window.addEventListener('show-ios-install', handleIOSInstall);
+
 		// Auto-show prompt after some time if not installed (mobile only)
 		const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
 			navigator.userAgent
@@ -69,6 +85,7 @@
 			window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 			window.removeEventListener('appinstalled', handleAppInstalled);
 			navigator.serviceWorker?.removeEventListener('message', handleSWMessage);
+			window.removeEventListener('show-ios-install', handleIOSInstall);
 		};
 	});
 
@@ -103,8 +120,8 @@
 	});
 </script>
 
-<!-- Install Prompt - Only show on mobile or when user explicitly triggers it -->
-{#if showInstallPrompt && !isInstalled && (deferredPrompt || isIOS)}
+<!-- Install Prompt - Show on mobile or iOS -->
+{#if showInstallPrompt && !isInstalled}
 	<div
 		class="fixed right-4 bottom-4 left-4 z-50 mx-auto max-w-md transform transition-all duration-300 ease-in-out"
 		role="dialog"
