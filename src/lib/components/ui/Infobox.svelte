@@ -45,6 +45,8 @@
 
 			showImageModal = true;
 			document.body.style.overflow = 'hidden';
+			// Scroll to top to ensure modal is visible
+			window.scrollTo({ top: 0, behavior: 'smooth' });
 			isFullscreen.set(true);
 		};
 	}
@@ -461,9 +463,9 @@
 			bottom: 0 !important;
 			width: 100vw !important;
 			height: 100vh !important;
-			background-color: rgba(0, 0, 0, 0.9) !important;
-			backdrop-filter: blur(8px) !important;
-			-webkit-backdrop-filter: blur(8px) !important;
+			background-color: rgba(0, 0, 0, 0.3) !important;
+			backdrop-filter: blur(12px) !important;
+			-webkit-backdrop-filter: blur(12px) !important;
 			z-index: 999999 !important;
 		"
 	>
