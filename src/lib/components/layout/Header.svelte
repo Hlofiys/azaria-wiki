@@ -40,7 +40,7 @@
 
 <header
 	id="main-header"
-	class="border-b-2"
+	class="border-b-2 rounded-lg"
 	style="
 		background-color: rgba(36, 36, 36, 0.9);
 		border-bottom-color: #c9a876;
