@@ -16,6 +16,8 @@
 	let dragStart = { x: 0, y: 0 };
 	let imagePosition = { x: 0, y: 0 };
 	let imageElement: HTMLImageElement;
+	let lastTouchDistance = 0;
+	let lastTouchCenter = { x: 0, y: 0 };
 
 	function openImageModal() {
 		if (!entry.image) return;
@@ -26,15 +28,18 @@
 			const imageWidth = img.naturalWidth;
 			const imageHeight = img.naturalHeight;
 
-			// Use a 10% margin around the image
-			const viewportWidth = window.innerWidth * 0.9;
-			const viewportHeight = window.innerHeight * 0.9;
+			// Mobile-friendly viewport calculation
+			const isMobile = window.innerWidth <= 768;
+			const marginFactor = isMobile ? 0.95 : 0.9; // Less margin on mobile
+			const viewportWidth = window.innerWidth * marginFactor;
+			const viewportHeight = window.innerHeight * marginFactor;
 
 			const widthRatio = viewportWidth / imageWidth;
 			const heightRatio = viewportHeight / imageHeight;
 
-			// Set the initial zoom to fit the screen, but don't scale up small images
-			initialImageZoom = Math.min(widthRatio, heightRatio, 1);
+			// Set the initial zoom to fit the screen, with minimum zoom for mobile
+			const minZoom = isMobile ? 0.8 : 0.5;
+			initialImageZoom = Math.max(minZoom, Math.min(widthRatio, heightRatio, 1));
 			imageZoom = initialImageZoom;
 			imagePosition = { x: 0, y: 0 };
 
@@ -110,6 +115,80 @@
 		}
 		
 		closeImageModal();
+	}
+
+	// Touch event handlers for mobile
+	function getTouchDistance(touches: TouchList) {
+		if (touches.length < 2) return 0;
+		const touch1 = touches[0];
+		const touch2 = touches[1];
+		return Math.sqrt(
+			Math.pow(touch2.clientX - touch1.clientX, 2) + 
+			Math.pow(touch2.clientY - touch1.clientY, 2)
+		);
+	}
+
+	function getTouchCenter(touches: TouchList) {
+		if (touches.length === 1) {
+			return { x: touches[0].clientX, y: touches[0].clientY };
+		}
+		if (touches.length >= 2) {
+			return {
+				x: (touches[0].clientX + touches[1].clientX) / 2,
+				y: (touches[0].clientY + touches[1].clientY) / 2
+			};
+		}
+		return { x: 0, y: 0 };
+	}
+
+	function handleTouchStart(event: TouchEvent) {
+		event.preventDefault();
+		
+		if (event.touches.length === 1) {
+			// Single touch - start dragging
+			if (imageZoom > 1) {
+				isDragging = true;
+				const touch = event.touches[0];
+				dragStart = { x: touch.clientX - imagePosition.x, y: touch.clientY - imagePosition.y };
+			}
+		} else if (event.touches.length === 2) {
+			// Two touches - start pinch zoom
+			isDragging = false;
+			lastTouchDistance = getTouchDistance(event.touches);
+			lastTouchCenter = getTouchCenter(event.touches);
+		}
+	}
+
+	function handleTouchMove(event: TouchEvent) {
+		event.preventDefault();
+		
+		if (event.touches.length === 1 && isDragging && imageZoom > 1) {
+			// Single touch drag
+			const touch = event.touches[0];
+			imagePosition = {
+				x: touch.clientX - dragStart.x,
+				y: touch.clientY - dragStart.y
+			};
+		} else if (event.touches.length === 2) {
+			// Pinch zoom
+			const currentDistance = getTouchDistance(event.touches);
+			const currentCenter = getTouchCenter(event.touches);
+			
+			if (lastTouchDistance > 0) {
+				const zoomFactor = currentDistance / lastTouchDistance;
+				imageZoom = Math.max(0.5, Math.min(5, imageZoom * zoomFactor));
+			}
+			
+			lastTouchDistance = currentDistance;
+			lastTouchCenter = currentCenter;
+		}
+	}
+
+	function handleTouchEnd(event: TouchEvent) {
+		if (event.touches.length === 0) {
+			isDragging = false;
+			lastTouchDistance = 0;
+		}
 	}
 </script>
 
@@ -391,8 +470,8 @@
 		<!-- Close button -->
 		<button
 			on:click={closeImageModal}
-			class="absolute top-6 right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
-			style="background-color: rgba(0, 0, 0, 0.7);"
+			class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[100] flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
+			style="background-color: rgba(0, 0, 0, 0.8);"
 			aria-label="Закрыть изображение"
 			title="Закрыть изображение"
 		>
@@ -408,23 +487,28 @@
 
 		<!-- Centered image container with margins -->
 		<div
-			class="relative flex items-center justify-center p-8 md:p-12 lg:p-16"
+			class="relative flex items-center justify-center p-4 sm:p-8 md:p-12 lg:p-16"
 			style="width: 100vw; height: 100vh;"
 			on:mousemove={handleImageMouseMove}
 			on:mouseup={handleImageMouseUp}
+			on:touchstart={handleTouchStart}
+			on:touchmove={handleTouchMove}
+			on:touchend={handleTouchEnd}
 			role="presentation"
 		>
 			<!-- Zoomable image -->
 			<div class="relative max-h-full max-w-full overflow-hidden">
 				<button
 					type="button"
-					class="relative block max-h-full max-w-full border-0 bg-transparent p-0 transition-transform duration-200 select-none focus:outline-none"
+					class="relative block max-h-full max-w-full border-0 bg-transparent p-0 transition-transform duration-200 select-none focus:outline-none touch-none"
 					style="
 						transform: scale({imageZoom}) translate({imagePosition.x / imageZoom}px, {imagePosition.y / imageZoom}px);
 						cursor: {imageZoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'};
 						display: flex;
 						align-items: center;
 						justify-content: center;
+						-webkit-user-select: none;
+						-webkit-touch-callout: none;
 					"
 					on:wheel={handleImageWheel}
 					on:mousedown={handleImageMouseDown}
@@ -442,7 +526,12 @@
 						src={entry.image}
 						alt={entry.title}
 						class="max-h-full max-w-full rounded-lg object-contain shadow-2xl"
-						style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);"
+						style="
+							box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+							-webkit-user-drag: none;
+							-webkit-user-select: none;
+							user-select: none;
+						"
 						draggable="false"
 					/>
 				</button>
@@ -450,11 +539,11 @@
 		</div>
 
 		<!-- Zoom controls -->
-		<div class="absolute bottom-6 right-6 z-[100] flex gap-2">
+		<div class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex gap-2">
 			<button
 				type="button"
-				class="flex h-10 w-10 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
-				style="background-color: rgba(0, 0, 0, 0.7);"
+				class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white text-lg sm:text-xl transition-all duration-200 hover:bg-opacity-80 active:scale-95"
+				style="background-color: rgba(0, 0, 0, 0.8);"
 				on:click={(e) => {
 					e.stopPropagation();
 					imageZoom = Math.max(0.5, imageZoom * 0.8);
@@ -465,8 +554,8 @@
 			</button>
 			<button
 				type="button"
-				class="flex h-10 w-10 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
-				style="background-color: rgba(0, 0, 0, 0.7);"
+				class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white text-lg sm:text-xl transition-all duration-200 hover:bg-opacity-80 active:scale-95"
+				style="background-color: rgba(0, 0, 0, 0.8);"
 				on:click={(e) => {
 					e.stopPropagation();
 					imageZoom = Math.min(5, imageZoom * 1.25);
@@ -477,8 +566,8 @@
 			</button>
 			<button
 				type="button"
-				class="flex h-10 w-10 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
-				style="background-color: rgba(0, 0, 0, 0.7);"
+				class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white text-lg sm:text-xl transition-all duration-200 hover:bg-opacity-80 active:scale-95"
+				style="background-color: rgba(0, 0, 0, 0.8);"
 				on:click={(e) => {
 					e.stopPropagation();
 					imageZoom = initialImageZoom;
