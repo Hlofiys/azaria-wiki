@@ -133,7 +133,7 @@
 	<!-- Slot Machine of Fate -->
 	<div
 		class="relative mb-8 overflow-hidden rounded-lg md:mb-12"
-		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid rgba(201, 168, 118, 0.8); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 12px rgba(201, 168, 118, 0.3);"
+		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 1px solid rgba(201, 168, 118, 0.4); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px rgba(201, 168, 118, 0.2);"
 	>
 		<div class="relative z-10 p-4 text-center md:p-8">
 			<h2 class="font-heading text-azaria-gold mb-3 text-xl md:mb-4 md:text-2xl lg:text-3xl">
@@ -153,11 +153,15 @@
 						? getCategoryColors(slotResults[reelIndex].category)
 						: getCategoryColors('characters')}
 					<div
-						class="relative flex h-24 w-20 flex-col items-center justify-center overflow-hidden rounded-lg p-1 transition-all duration-300 sm:h-32 sm:w-24 md:h-40 md:w-32 md:p-2"
+						class="relative flex h-24 w-20 flex-col items-center justify-center overflow-hidden rounded-xl p-1 transition-all duration-300 sm:h-32 sm:w-24 md:h-40 md:w-32 md:p-2"
 						style="
-							background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%);
-							border: 2px solid {resultColors ? resultColors.border + 'CC' : 'rgba(201, 168, 118, 0.7)'};
-							box-shadow: 0 0 10px {resultColors ? resultColors.glow + '60' : 'rgba(201, 168, 118, 0.25)'};
+							background:
+								linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%),
+								radial-gradient(ellipse at center, rgba(201, 168, 118, 0.1) 0%, transparent 70%);
+							border: 2px solid {resultColors ? resultColors.border + 'DD' : 'rgba(201, 168, 118, 0.8)'};
+							box-shadow:
+								0 0 20px {resultColors ? resultColors.glow + '50' : 'rgba(201, 168, 118, 0.3)'},
+								0 4px 8px rgba(0, 0, 0, 0.5);
 						"
 					>
 						{#if resultColors}
@@ -334,12 +338,12 @@
 	<!-- Call to Action -->
 	<div
 		class="relative overflow-hidden rounded-lg p-4 text-center md:p-8"
-		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 2px solid #FFD70050; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 215, 0, 0.2);"
+		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 1px solid rgba(255, 215, 0, 0.3); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 4px rgba(255, 215, 0, 0.1);"
 	>
 		<!-- Subtle background effect -->
 		<div
-			class="absolute inset-0 opacity-5"
-			style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%, rgba(255, 215, 0, 0.1) 100%);"
+			class="absolute inset-0 opacity-3"
+			style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, transparent 50%, rgba(255, 215, 0, 0.05) 100%);"
 		></div>
 
 		<div class="relative z-10">

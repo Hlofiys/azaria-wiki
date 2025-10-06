@@ -57,7 +57,7 @@
 		class="background-image"
 		class:visible
 		style:background-image={imageUrl ? `url(${imageUrl})` : 'none'}
-	/>
+	></div>
 	{#if showHeader}
 		<Header />
 	{/if}
@@ -72,7 +72,7 @@
 	<InstallPrompt />
 	<ScrollToTop />
 
-	<footer class="azaria-card border-t-2" style="border-top-color: #c9a876; margin-top: 4rem;">
+	<footer style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border-top: 2px solid #c9a876; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4); border-radius: 0.5rem; margin-top: 4rem;">
 		<div class="container mx-auto px-4 py-8 text-center">
 			<p style="color: rgba(208, 208, 208, 0.7); font-family: 'Lora', serif;">
 				Вики мира Азарии — Медивал-деп-панк вселенная

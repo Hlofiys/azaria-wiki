@@ -34,7 +34,7 @@
 
 {#if showButton}
 	<button
-		on:click={scrollToTop}
+		onclick={scrollToTop}
 		class="scroll-to-top-btn azaria-btn"
 		title="Вернуться к заголовку"
 		aria-label="Scroll to top"

@@ -42,7 +42,7 @@
 	id="main-header"
 	class="border-b-2 rounded-lg"
 	style="
-		background-color: rgba(36, 36, 36, 0.9);
+		background: linear-gradient(145deg, rgba(36, 36, 36, 0.9) 0%, rgba(42, 42, 42, 0.9) 100%);
 		border-bottom-color: #c9a876;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
 	"
