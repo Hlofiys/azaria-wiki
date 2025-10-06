@@ -21,31 +21,11 @@
 			initializeClientData(data.allEntries);
 		}
 
-		const header = document.getElementById('main-header');
-		function adjustPadding() {
-			if (header && mainContent) {
-				const headerHeight = header.offsetHeight;
-				mainContent.style.paddingTop = `${headerHeight + 32}px`;
-			}
-		}
-
-		adjustPadding();
-		window.addEventListener('resize', adjustPadding);
-
-		const observer = new MutationObserver(adjustPadding);
-		if (header) {
-			observer.observe(header, { attributes: true, childList: true, subtree: true });
-		}
-
 		const unsubscribe = isFullscreen.subscribe((value) => {
 			showHeader = !value;
 		});
 
 		return () => {
-			window.removeEventListener('resize', adjustPadding);
-			if (header) {
-				observer.disconnect();
-			}
 			unsubscribe();
 		};
 	});
@@ -82,7 +62,7 @@
 	{/if}
 
 	<PageTransition>
-		<main bind:this={mainContent} class="container mx-auto px-4 pb-8">
+		<main bind:this={mainContent} class="container mx-auto px-4 py-8">
 			{@render children()}
 		</main>
 	</PageTransition>

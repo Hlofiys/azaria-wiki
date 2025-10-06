@@ -42,14 +42,7 @@
 	id="main-header"
 	class="border-b-2"
 	style="
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		z-index: 10;
-		background-color: rgba(36, 36, 36, 0.8);
-		-webkit-backdrop-filter: blur(8px);
-		backdrop-filter: blur(8px);
+		background-color: rgba(36, 36, 36, 0.9);
 		border-bottom-color: #c9a876;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
 	"

@@ -163,6 +163,9 @@ export default defineConfig({
 	server: {
 		// Enable compression in dev
 		middlewareMode: false,
+		// Allow external hosts
+		host: true,
+		allowedHosts: ['work-1-mxkolbgchykermep.prod-runtime.all-hands.dev'],
 		// Optimize HMR
 		hmr: {
 			overlay: false
