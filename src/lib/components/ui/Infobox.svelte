@@ -45,8 +45,23 @@
 
 			showImageModal = true;
 			document.body.style.overflow = 'hidden';
-			// Scroll to top to ensure modal is visible
-			window.scrollTo({ top: 0, behavior: 'smooth' });
+			
+			// Smart scroll positioning: only scroll if modal wouldn't be properly visible
+			const currentScrollY = window.scrollY;
+			const currentViewportHeight = window.innerHeight;
+			const documentHeight = document.documentElement.scrollHeight;
+			
+			// Check if we're in the bottom half of the page
+			const isInBottomHalf = currentScrollY > (documentHeight - currentViewportHeight) / 2;
+			
+			// If we're in the bottom half, scroll to a position that centers the modal
+			if (isInBottomHalf) {
+				// Calculate optimal scroll position to center the modal in viewport
+				const optimalScrollY = Math.max(0, currentScrollY - currentViewportHeight * 0.2);
+				window.scrollTo({ top: optimalScrollY, behavior: 'smooth' });
+			}
+			// If we're in the top half, don't scroll - modal will be visible
+			
 			isFullscreen.set(true);
 		};
 	}
