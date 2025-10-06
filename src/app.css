@@ -46,6 +46,14 @@ a:hover {
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
+.azaria-panel {
+	background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
+	border: 1px solid rgba(201, 168, 118, 0.4);
+	box-shadow:
+		0 4px 16px rgba(0, 0, 0, 0.3),
+		0 0 8px rgba(201, 168, 118, 0.2);
+}
+
 .azaria-btn {
 	background: linear-gradient(145deg, #1a1a1a 0%, #242424 100%);
 	color: #c9a876;

@@ -32,7 +32,11 @@ export type UIIconType =
 	| 'status'
 	| 'age'
 	| 'population'
-	| 'loading';
+	| 'loading'
+	| 'close'
+	| 'zoom-in'
+	| 'zoom-out'
+	| 'zoom-reset';
 
 // Category icon mappings using Iconify icons
 export const categoryIcons: Record<CategoryType, string> = {
@@ -111,7 +115,11 @@ export const uiIcons: Record<UIIconType, string> = {
 	status: 'mdi:heart',
 	age: 'mdi:clock-time-four',
 	population: 'mdi:account-group',
-	loading: 'mdi:loading'
+	loading: 'mdi:loading',
+	close: 'mdi:close',
+	'zoom-in': 'mdi:magnify-plus',
+	'zoom-out': 'mdi:magnify-minus',
+	'zoom-reset': 'mdi:magnify-scan'
 };
 
 // Get category icon name

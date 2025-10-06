@@ -56,7 +56,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 0;
-		box-shadow: 
+		box-shadow:
 			0 4px 12px rgba(0, 0, 0, 0.5),
 			0 0 8px rgba(201, 168, 118, 0.3);
 		transition: all 0.3s ease;
@@ -65,7 +65,7 @@
 
 	.scroll-to-top-btn:hover {
 		transform: translateY(-2px) scale(1.05);
-		box-shadow: 
+		box-shadow:
 			0 6px 16px rgba(0, 0, 0, 0.6),
 			0 0 12px rgba(201, 168, 118, 0.5);
 	}

@@ -131,10 +131,7 @@
 	</LoadingAnimations>
 
 	<!-- Slot Machine of Fate -->
-	<div
-		class="relative mb-8 overflow-hidden rounded-lg md:mb-12"
-		style="background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%); border: 1px solid rgba(201, 168, 118, 0.4); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 8px rgba(201, 168, 118, 0.2);"
-	>
+	<div class="azaria-panel relative mb-8 overflow-hidden rounded-lg md:mb-12">
 		<div class="relative z-10 p-4 text-center md:p-8">
 			<h2 class="font-heading text-azaria-gold mb-3 text-xl md:mb-4 md:text-2xl lg:text-3xl">
 				<div class="flex flex-col items-center justify-center gap-2 sm:flex-row">

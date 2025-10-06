@@ -8,6 +8,8 @@
 	import { getRandomEntry } from '$lib/client-data.js';
 	import InstallButton from '$lib/components/pwa/InstallButton.svelte';
 
+	export let extraClass = '';
+
 	let searchQuery = '';
 
 	// Navigation items with their categories for coloring
@@ -40,7 +42,7 @@
 
 <header
 	id="main-header"
-	class="border-b-2 rounded-lg"
+	class="rounded-lg border-b-2 {extraClass}"
 	style="
 		background: linear-gradient(145deg, rgba(36, 36, 36, 0.9) 0%, rgba(42, 42, 42, 0.9) 100%);
 		border-bottom-color: #c9a876;
