@@ -18,9 +18,13 @@
 	let imageElement: HTMLImageElement;
 	let lastTouchDistance = 0;
 	let lastTouchCenter = { x: 0, y: 0 };
+	let savedScrollY = 0;
 
 	function openImageModal() {
 		if (!entry.image) return;
+
+		// Save current scroll position
+		savedScrollY = window.scrollY;
 
 		const img = new Image();
 		img.src = entry.image;
@@ -30,7 +34,7 @@
 
 			// Mobile-friendly viewport calculation
 			const isMobile = window.innerWidth <= 768;
-			const marginFactor = isMobile ? 0.95 : 0.9; // Less margin on mobile
+			const marginFactor = isMobile ? 0.98 : 0.8; // Larger margin on mobile for better fit
 			const viewportWidth = window.innerWidth * marginFactor;
 			const viewportHeight = window.innerHeight * marginFactor;
 
@@ -38,42 +42,38 @@
 			const heightRatio = viewportHeight / imageHeight;
 
 			// Set the initial zoom to fit the screen, with minimum zoom for mobile
-			const minZoom = isMobile ? 0.8 : 0.5;
+			const minZoom = isMobile ? 0.8 : 0.3;
 			initialImageZoom = Math.max(minZoom, Math.min(widthRatio, heightRatio, 1));
 			imageZoom = initialImageZoom;
 			imagePosition = { x: 0, y: 0 };
 
 			showImageModal = true;
+
+			// Prevent background scroll
+			document.body.style.position = 'fixed';
+			document.body.style.top = `-${savedScrollY}px`;
 			document.body.style.overflow = 'hidden';
-			
-			// Smart scroll positioning: only scroll if modal wouldn't be properly visible
-			const currentScrollY = window.scrollY;
-			const currentViewportHeight = window.innerHeight;
-			const documentHeight = document.documentElement.scrollHeight;
-			
-			// Check if we're in the bottom half of the page
-			const isInBottomHalf = currentScrollY > (documentHeight - currentViewportHeight) / 2;
-			
-			// If we're in the bottom half, scroll to a position that centers the modal
-			if (isInBottomHalf) {
-				// Calculate optimal scroll position to center the modal in viewport
-				const optimalScrollY = Math.max(0, currentScrollY - currentViewportHeight * 0.2);
-				window.scrollTo({ top: optimalScrollY, behavior: 'smooth' });
-			}
-			// If we're in the top half, don't scroll - modal will be visible
-			
+
 			isFullscreen.set(true);
 		};
 	}
 
 	function closeImageModal() {
 		showImageModal = false;
+
+		// Restore background scroll
+		document.body.style.position = '';
+		document.body.style.top = '';
 		document.body.style.overflow = 'auto';
+
 		isFullscreen.set(false);
 		imagePosition = { x: 0, y: 0 };
 		// Reset zoom state for the next time the modal is opened
 		initialImageZoom = 1;
 		imageZoom = 1;
+
+		// Restore scroll position
+		window.scrollTo({ top: savedScrollY, behavior: 'instant' });
 	}
 
 	function handleImageWheel(event: WheelEvent) {
@@ -122,15 +122,17 @@
 	function handleBackgroundClick(event: MouseEvent) {
 		// Close modal when clicking outside the image
 		const target = event.target as HTMLElement;
-		
+
 		// Don't close if clicking on image, controls, or buttons
-		if (target.tagName === 'IMG' || 
-			target.tagName === 'BUTTON' || 
-			target.closest('button') || 
-			target.closest('[role="button"]')) {
+		if (
+			target.tagName === 'IMG' ||
+			target.tagName === 'BUTTON' ||
+			target.closest('button') ||
+			target.closest('[role="button"]')
+		) {
 			return;
 		}
-		
+
 		closeImageModal();
 	}
 
@@ -140,8 +142,7 @@
 		const touch1 = touches[0];
 		const touch2 = touches[1];
 		return Math.sqrt(
-			Math.pow(touch2.clientX - touch1.clientX, 2) + 
-			Math.pow(touch2.clientY - touch1.clientY, 2)
+			Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2)
 		);
 	}
 
@@ -160,7 +161,7 @@
 
 	function handleTouchStart(event: TouchEvent) {
 		event.preventDefault();
-		
+
 		if (event.touches.length === 1) {
 			// Single touch - start dragging
 			if (imageZoom > 1) {
@@ -178,7 +179,7 @@
 
 	function handleTouchMove(event: TouchEvent) {
 		event.preventDefault();
-		
+
 		if (event.touches.length === 1 && isDragging && imageZoom > 1) {
 			// Single touch drag
 			const touch = event.touches[0];
@@ -190,12 +191,12 @@
 			// Pinch zoom
 			const currentDistance = getTouchDistance(event.touches);
 			const currentCenter = getTouchCenter(event.touches);
-			
+
 			if (lastTouchDistance > 0) {
 				const zoomFactor = currentDistance / lastTouchDistance;
 				imageZoom = Math.max(0.5, Math.min(5, imageZoom * zoomFactor));
 			}
-			
+
 			lastTouchDistance = currentDistance;
 			lastTouchCenter = currentCenter;
 		}
@@ -487,7 +488,7 @@
 		<!-- Close button -->
 		<button
 			on:click={closeImageModal}
-			class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[100] flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white transition-all duration-200 hover:bg-opacity-80"
+			class="hover:bg-opacity-80 absolute top-4 right-4 z-[100] flex h-10 w-10 items-center justify-center rounded-full text-white transition-all duration-200 sm:top-6 sm:right-6 sm:h-12 sm:w-12"
 			style="background-color: rgba(0, 0, 0, 0.8);"
 			aria-label="Закрыть изображение"
 			title="Закрыть изображение"
@@ -502,10 +503,10 @@
 			</svg>
 		</button>
 
-		<!-- Centered image container with margins -->
+		<!-- Centered image container -->
 		<div
-			class="relative flex items-center justify-center p-4 sm:p-8 md:p-12 lg:p-16"
-			style="width: 100vw; height: 100vh;"
+			class="absolute"
+			style="top: 50%; left: 50%; transform: translate(-50%, -50%);"
 			on:mousemove={handleImageMouseMove}
 			on:mouseup={handleImageMouseUp}
 			on:touchstart={handleTouchStart}
@@ -517,9 +518,10 @@
 			<div class="relative max-h-full max-w-full overflow-hidden">
 				<button
 					type="button"
-					class="relative block max-h-full max-w-full border-0 bg-transparent p-0 transition-transform duration-200 select-none focus:outline-none touch-none"
+					class="relative block max-h-full max-w-full touch-none border-0 bg-transparent p-0 transition-transform duration-200 select-none focus:outline-none"
 					style="
-						transform: scale({imageZoom}) translate({imagePosition.x / imageZoom}px, {imagePosition.y / imageZoom}px);
+						transform: scale({imageZoom}) translate({imagePosition.x / imageZoom}px, {imagePosition.y /
+						imageZoom}px);
 						cursor: {imageZoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'};
 						display: flex;
 						align-items: center;
@@ -556,10 +558,10 @@
 		</div>
 
 		<!-- Zoom controls -->
-		<div class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex gap-2">
+		<div class="absolute right-4 bottom-4 z-[100] flex gap-2 sm:right-6 sm:bottom-6">
 			<button
 				type="button"
-				class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white text-lg sm:text-xl transition-all duration-200 hover:bg-opacity-80 active:scale-95"
+				class="hover:bg-opacity-80 flex h-10 w-10 items-center justify-center rounded-full text-lg text-white transition-all duration-200 active:scale-95 sm:h-12 sm:w-12 sm:text-xl"
 				style="background-color: rgba(0, 0, 0, 0.8);"
 				on:click={(e) => {
 					e.stopPropagation();
@@ -571,7 +573,7 @@
 			</button>
 			<button
 				type="button"
-				class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white text-lg sm:text-xl transition-all duration-200 hover:bg-opacity-80 active:scale-95"
+				class="hover:bg-opacity-80 flex h-10 w-10 items-center justify-center rounded-full text-lg text-white transition-all duration-200 active:scale-95 sm:h-12 sm:w-12 sm:text-xl"
 				style="background-color: rgba(0, 0, 0, 0.8);"
 				on:click={(e) => {
 					e.stopPropagation();
@@ -583,7 +585,7 @@
 			</button>
 			<button
 				type="button"
-				class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-white text-lg sm:text-xl transition-all duration-200 hover:bg-opacity-80 active:scale-95"
+				class="hover:bg-opacity-80 flex h-10 w-10 items-center justify-center rounded-full text-lg text-white transition-all duration-200 active:scale-95 sm:h-12 sm:w-12 sm:text-xl"
 				style="background-color: rgba(0, 0, 0, 0.8);"
 				on:click={(e) => {
 					e.stopPropagation();
