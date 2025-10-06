@@ -4,6 +4,7 @@
 	import InstallPrompt from '$lib/components/pwa/InstallPrompt.svelte';
 	import PWAManager from '$lib/components/pwa/PWAManager.svelte';
 	import PageTransition from '$lib/components/ui/PageTransition.svelte';
+	import ScrollToTop from '$lib/components/ui/ScrollToTop.svelte';
 	import { initializeClientData } from '$lib/client-data.js';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
@@ -21,31 +22,11 @@
 			initializeClientData(data.allEntries);
 		}
 
-		const header = document.getElementById('main-header');
-		function adjustPadding() {
-			if (header && mainContent) {
-				const headerHeight = header.offsetHeight;
-				mainContent.style.paddingTop = `${headerHeight + 32}px`;
-			}
-		}
-
-		adjustPadding();
-		window.addEventListener('resize', adjustPadding);
-
-		const observer = new MutationObserver(adjustPadding);
-		if (header) {
-			observer.observe(header, { attributes: true, childList: true, subtree: true });
-		}
-
 		const unsubscribe = isFullscreen.subscribe((value) => {
 			showHeader = !value;
 		});
 
 		return () => {
-			window.removeEventListener('resize', adjustPadding);
-			if (header) {
-				observer.disconnect();
-			}
 			unsubscribe();
 		};
 	});
@@ -82,13 +63,14 @@
 	{/if}
 
 	<PageTransition>
-		<main bind:this={mainContent} class="container mx-auto px-4 pb-8">
+		<main bind:this={mainContent} class="container mx-auto px-4 py-8">
 			{@render children()}
 		</main>
 	</PageTransition>
 
 	<PWAManager />
 	<InstallPrompt />
+	<ScrollToTop />
 
 	<footer class="azaria-card border-t-2" style="border-top-color: #c9a876; margin-top: 4rem;">
 		<div class="container mx-auto px-4 py-8 text-center">
