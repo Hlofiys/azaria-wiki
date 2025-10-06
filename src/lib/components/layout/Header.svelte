@@ -7,9 +7,11 @@
 	import type { CategoryType } from '$lib/icons';
 	import { getRandomEntry } from '$lib/client-data.js';
 	import InstallButton from '$lib/components/pwa/InstallButton.svelte';
+	import { onMount } from 'svelte';
 
 	let searchQuery = '';
 	let mobileMenuOpen = false;
+	let showScrollToTop = $state(false);
 
 	// Navigation items with their categories for coloring
 	const navItems: Array<{ href: string; category: CategoryType; label: string }> = [
@@ -45,6 +47,21 @@
 	function closeMobileMenu() {
 		mobileMenuOpen = false;
 	}
+
+	function scrollToTop() {
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
+
+	function handleScroll() {
+		showScrollToTop = window.scrollY > 300;
+	}
+
+	onMount(() => {
+		window.addEventListener('scroll', handleScroll);
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+		};
+	});
 </script>
 
 <header
@@ -56,11 +73,10 @@
 		left: 0;
 		width: 100%;
 		z-index: 10;
-		background-color: rgba(36, 36, 36, 0.8);
-		-webkit-backdrop-filter: blur(8px);
-		backdrop-filter: blur(8px);
+		background-color: #242424;
+		background-image: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
 		border-bottom-color: #c9a876;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 	"
 >
 	<div class="container mx-auto px-4 py-3 md:py-4">
@@ -217,6 +233,18 @@
 	</div>
 </header>
 
+<!-- Scroll to Top Button -->
+{#if showScrollToTop}
+	<button
+		class="scroll-to-top-btn"
+		on:click={scrollToTop}
+		title="Наверх"
+		aria-label="Прокрутить наверх"
+	>
+		<Icon icon="mdi:chevron-up" width="24" />
+	</button>
+{/if}
+
 <style>
 	.nav-link {
 		color: #d0d0d0;
@@ -343,4 +371,60 @@
 			width: 4rem !important;
 		}
 	}
-</style>
+
+	/* Scroll to Top Button */
+	.scroll-to-top-btn {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		z-index: 50;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		background-color: #242424;
+		background-image: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
+		border: 1px solid rgba(201, 168, 118, 0.3);
+		color: #c9a876;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.3s ease;
+		animation: fadeInUp 0.3s ease-out;
+		}
+
+		.scroll-to-top-btn:hover {
+		background-color: #2a2a2a;
+		border-color: #c9a876;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(201, 168, 118, 0.2);
+		transform: translateY(-2px);
+		color: #e6c190;
+		}
+
+		.scroll-to-top-btn:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+		}
+
+		@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		}
+
+		/* Mobile scroll to top button */
+		@media (max-width: 768px) {
+		.scroll-to-top-btn {
+			bottom: 1.5rem;
+			right: 1.5rem;
+			width: 2.5rem;
+			height: 2.5rem;
+		}
+		}
+	</style>
