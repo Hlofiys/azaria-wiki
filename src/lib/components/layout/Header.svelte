@@ -10,7 +10,6 @@
 	import { onMount } from 'svelte';
 
 	let searchQuery = '';
-	let mobileMenuOpen = false;
 	let showScrollToTop = $state(false);
 
 	// Navigation items with their categories for coloring
@@ -40,13 +39,7 @@
 		}
 	}
 
-	function toggleMobileMenu() {
-		mobileMenuOpen = !mobileMenuOpen;
-	}
 
-	function closeMobileMenu() {
-		mobileMenuOpen = false;
-	}
 
 	function scrollToTop() {
 		window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -104,7 +97,7 @@
 			</div>
 
 			<!-- Desktop Navigation -->
-			<nav class="hidden items-center space-x-6 md:flex">
+			<nav class="flex flex-wrap items-center justify-center gap-2 md:space-x-6 md:gap-0">
 				{#each navItems as item (item.href)}
 					{@const colors = getCategoryColors(item.category)}
 					{@const isActive = $page.url.pathname.startsWith(item.href)}
@@ -142,16 +135,6 @@
 
 			<!-- Search, Install, and Actions -->
 			<div class="flex items-center justify-center space-x-2 md:justify-end md:space-x-4">
-				<!-- Mobile Menu Toggle (visible only on mobile) -->
-				<button
-					on:click={toggleMobileMenu}
-					class="azaria-btn md:hidden"
-					style="padding: 0.5rem 0.75rem;"
-					title="Меню"
-					aria-label="Toggle mobile menu"
-				>
-					<Icon icon={mobileMenuOpen ? "mdi:close" : "mdi:menu"} width="16" />
-				</button>
 
 				<!-- Install Button -->
 				<InstallButton />
@@ -187,49 +170,6 @@
 			</div>
 		</div>
 
-		<!-- Mobile Navigation -->
-		{#if mobileMenuOpen}
-			<div class="mt-4 md:hidden mobile-nav-dropdown">
-				<div class="grid grid-cols-2 gap-2 text-xs">
-					{#each navItems as item (item.href)}
-						{@const colors = getCategoryColors(item.category)}
-						{@const isActive = $page.url.pathname.startsWith(item.href)}
-						<a
-							href={resolve(item.href as `/${string}`)}
-							class="nav-link-mobile flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105"
-							class:active={isActive}
-							style="
-								color: {isActive ? colors.primary : '#d0d0d0'};
-								border: 1px solid {isActive ? colors.border : 'rgba(201, 168, 118, 0.2)'};
-								background: {isActive ? colors.bg : 'transparent'};
-								border-radius: 0.375rem;
-							"
-							on:click={closeMobileMenu}
-							on:mouseenter={(e) => {
-								e.currentTarget.style.backgroundColor = colors.bg;
-								e.currentTarget.style.borderColor = colors.border;
-								e.currentTarget.style.boxShadow = `0 0 8px ${colors.glow}`;
-							}}
-							on:mouseleave={(e) => {
-								if (!isActive) {
-									e.currentTarget.style.backgroundColor = 'transparent';
-									e.currentTarget.style.borderColor = 'rgba(201, 168, 118, 0.2)';
-									e.currentTarget.style.boxShadow = 'none';
-								}
-							}}
-						>
-							<Icon
-								icon={getCategoryIcon(item.category)}
-								width="16"
-								class="mb-1 transition-colors duration-150"
-								style="color: {isActive ? colors.primary : colors.secondary} !important;"
-							/>
-							<span class="text-center">{item.label}</span>
-						</a>
-					{/each}
-				</div>
-			</div>
-		{/if}
 	</div>
 </header>
 
@@ -273,47 +213,7 @@
 		transition: none !important;
 	}
 
-	.nav-link-mobile {
-		color: #d0d0d0;
-		transition:
-			color 0.15s ease,
-			background-color 0.3s ease,
-			border-color 0.3s ease,
-			box-shadow 0.3s ease;
-		font-family: 'Lora', serif;
-		text-align: center;
-		padding: 0.5rem 0.25rem;
-		border-radius: 0.25rem;
-	}
 
-	.nav-link-mobile:hover {
-		color: #c9a876;
-	}
-
-	/* Ensure mobile icon colors update instantly */
-	.nav-link-mobile :global(svg) {
-		transition: color 0.1s ease !important;
-	}
-
-	.nav-link-mobile.active :global(svg) {
-		transition: none !important;
-	}
-
-	/* Mobile navigation dropdown animation */
-	.mobile-nav-dropdown {
-		animation: slideDown 0.3s ease-out;
-	}
-
-	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
 
 	/* Improve mobile header compactness */
 	@media (max-width: 768px) {
@@ -321,10 +221,7 @@
 			padding-bottom: 0.75rem !important;
 		}
 		
-		.mobile-nav-dropdown {
-			margin-top: 0.75rem;
-			padding-bottom: 0.5rem;
-		}
+
 
 		/* Make mobile header more compact */
 		.container {
