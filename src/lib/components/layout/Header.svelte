@@ -9,6 +9,7 @@
 	import InstallButton from '$lib/components/pwa/InstallButton.svelte';
 
 	let searchQuery = '';
+	let mobileMenuOpen = false;
 
 	// Navigation items with their categories for coloring
 	const navItems: Array<{ href: string; category: CategoryType; label: string }> = [
@@ -36,6 +37,14 @@
 			console.error('Error getting random article:', error);
 		}
 	}
+
+	function toggleMobileMenu() {
+		mobileMenuOpen = !mobileMenuOpen;
+	}
+
+	function closeMobileMenu() {
+		mobileMenuOpen = false;
+	}
 </script>
 
 <header
@@ -54,8 +63,8 @@
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
 	"
 >
-	<div class="container mx-auto px-4 py-4">
-		<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+	<div class="container mx-auto px-4 py-3 md:py-4">
+		<div class="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
 			<!-- Logo and Title -->
 			<div class="flex items-center justify-center space-x-4 md:justify-start">
 				<a
@@ -117,6 +126,17 @@
 
 			<!-- Search, Install, and Actions -->
 			<div class="flex items-center justify-center space-x-2 md:justify-end md:space-x-4">
+				<!-- Mobile Menu Toggle (visible only on mobile) -->
+				<button
+					on:click={toggleMobileMenu}
+					class="azaria-btn md:hidden"
+					style="padding: 0.5rem 0.75rem;"
+					title="Меню"
+					aria-label="Toggle mobile menu"
+				>
+					<Icon icon={mobileMenuOpen ? "mdi:close" : "mdi:menu"} width="16" />
+				</button>
+
 				<!-- Install Button -->
 				<InstallButton />
 				<form on:submit|preventDefault={handleSearch} class="flex items-center">
@@ -124,7 +144,7 @@
 						type="text"
 						bind:value={searchQuery}
 						placeholder="Поиск..."
-						class="azaria-input w-24 text-sm md:w-48"
+						class="azaria-input w-20 text-sm md:w-48"
 					/>
 					<button type="submit" class="azaria-btn ml-1 md:ml-2" style="padding: 0.5rem 0.75rem;">
 						<Icon icon="mdi:magnify" width="16" />
@@ -152,45 +172,48 @@
 		</div>
 
 		<!-- Mobile Navigation -->
-		<div class="mt-4 md:hidden">
-			<div class="grid grid-cols-2 gap-2 text-xs">
-				{#each navItems as item (item.href)}
-					{@const colors = getCategoryColors(item.category)}
-					{@const isActive = $page.url.pathname.startsWith(item.href)}
-					<a
-						href={resolve(item.href as `/${string}`)}
-						class="nav-link-mobile flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105"
-						class:active={isActive}
-						style="
-							color: {isActive ? colors.primary : '#d0d0d0'};
-							border: 1px solid {isActive ? colors.border : 'rgba(201, 168, 118, 0.2)'};
-							background: {isActive ? colors.bg : 'transparent'};
-							border-radius: 0.375rem;
-						"
-						on:mouseenter={(e) => {
-							e.currentTarget.style.backgroundColor = colors.bg;
-							e.currentTarget.style.borderColor = colors.border;
-							e.currentTarget.style.boxShadow = `0 0 8px ${colors.glow}`;
-						}}
-						on:mouseleave={(e) => {
-							if (!isActive) {
-								e.currentTarget.style.backgroundColor = 'transparent';
-								e.currentTarget.style.borderColor = 'rgba(201, 168, 118, 0.2)';
-								e.currentTarget.style.boxShadow = 'none';
-							}
-						}}
-					>
-						<Icon
-							icon={getCategoryIcon(item.category)}
-							width="16"
-							class="mb-1 transition-colors duration-150"
-							style="color: {isActive ? colors.primary : colors.secondary} !important;"
-						/>
-						<span class="text-center">{item.label}</span>
-					</a>
-				{/each}
+		{#if mobileMenuOpen}
+			<div class="mt-4 md:hidden mobile-nav-dropdown">
+				<div class="grid grid-cols-2 gap-2 text-xs">
+					{#each navItems as item (item.href)}
+						{@const colors = getCategoryColors(item.category)}
+						{@const isActive = $page.url.pathname.startsWith(item.href)}
+						<a
+							href={resolve(item.href as `/${string}`)}
+							class="nav-link-mobile flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105"
+							class:active={isActive}
+							style="
+								color: {isActive ? colors.primary : '#d0d0d0'};
+								border: 1px solid {isActive ? colors.border : 'rgba(201, 168, 118, 0.2)'};
+								background: {isActive ? colors.bg : 'transparent'};
+								border-radius: 0.375rem;
+							"
+							on:click={closeMobileMenu}
+							on:mouseenter={(e) => {
+								e.currentTarget.style.backgroundColor = colors.bg;
+								e.currentTarget.style.borderColor = colors.border;
+								e.currentTarget.style.boxShadow = `0 0 8px ${colors.glow}`;
+							}}
+							on:mouseleave={(e) => {
+								if (!isActive) {
+									e.currentTarget.style.backgroundColor = 'transparent';
+									e.currentTarget.style.borderColor = 'rgba(201, 168, 118, 0.2)';
+									e.currentTarget.style.boxShadow = 'none';
+								}
+							}}
+						>
+							<Icon
+								icon={getCategoryIcon(item.category)}
+								width="16"
+								class="mb-1 transition-colors duration-150"
+								style="color: {isActive ? colors.primary : colors.secondary} !important;"
+							/>
+							<span class="text-center">{item.label}</span>
+						</a>
+					{/each}
+				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
 </header>
 
@@ -246,5 +269,78 @@
 
 	.nav-link-mobile.active :global(svg) {
 		transition: none !important;
+	}
+
+	/* Mobile navigation dropdown animation */
+	.mobile-nav-dropdown {
+		animation: slideDown 0.3s ease-out;
+	}
+
+	@keyframes slideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	/* Improve mobile header compactness */
+	@media (max-width: 768px) {
+		header {
+			padding-bottom: 0.75rem !important;
+		}
+		
+		.mobile-nav-dropdown {
+			margin-top: 0.75rem;
+			padding-bottom: 0.5rem;
+		}
+
+		/* Make mobile header more compact */
+		.container {
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+
+		/* Optimize mobile button spacing */
+		.azaria-btn {
+			padding: 0.4rem 0.6rem !important;
+			font-size: 0.875rem;
+		}
+
+		/* Smaller logo on mobile */
+		h1 {
+			font-size: 1.25rem !important;
+		}
+
+		/* Compact mobile search */
+		.azaria-input {
+			padding: 0.5rem !important;
+			font-size: 0.875rem;
+		}
+	}
+
+	/* Extra small mobile devices */
+	@media (max-width: 480px) {
+		.container {
+			padding-left: 0.75rem;
+			padding-right: 0.75rem;
+		}
+
+		.azaria-btn {
+			padding: 0.35rem 0.5rem !important;
+			font-size: 0.8rem;
+		}
+
+		h1 {
+			font-size: 1.125rem !important;
+		}
+
+		/* Hide some elements on very small screens to save space */
+		.azaria-input {
+			width: 4rem !important;
+		}
 	}
 </style>

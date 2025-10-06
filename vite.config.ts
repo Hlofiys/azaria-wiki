@@ -166,7 +166,9 @@ export default defineConfig({
 		// Optimize HMR
 		hmr: {
 			overlay: false
-		}
+		},
+		host: true,
+		allowedHosts: ['work-1-ladzilwryihxmnwh.prod-runtime.all-hands.dev', 'work-2-ladzilwryihxmnwh.prod-runtime.all-hands.dev']
 	},
 
 	// Enable experimental features for better performance
