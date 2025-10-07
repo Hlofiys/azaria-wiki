@@ -78,19 +78,24 @@ const CACHE_TTL = 1000 * 60 * 5; // 5 minutes cache in development
 
 // Load entity map for wiki linking with caching
 let entityMap: Record<string, EntityMapEntry> = {};
-try {
-	const entityMapPath = path.join(process.cwd(), 'src/lib/entity-map.json');
-	const cacheKey = 'entity-map';
 
-	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
-		entityMap = serverCache.get(cacheKey);
-	} else {
-		entityMap = JSON.parse(fs.readFileSync(entityMapPath, 'utf-8'));
-		serverCache.set(cacheKey, entityMap);
-		cacheTimestamps.set(cacheKey, Date.now());
+async function loadEntityMap(): Promise<void> {
+	try {
+		const entityMapPath = path.join(process.cwd(), 'src/lib/entity-map.json');
+		const cacheKey = 'entity-map';
+
+		if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
+			entityMap = serverCache.get(cacheKey) as Record<string, EntityMapEntry>;
+		} else {
+			entityMap = JSON.parse(await fs.promises.readFile(entityMapPath, 'utf-8'));
+			serverCache.set(cacheKey, entityMap);
+			cacheTimestamps.set(cacheKey, Date.now());
+		}
+	} catch {
+		if (process.env.NODE_ENV === 'development') {
+		console.warn('Entity map not found, wiki linking will be disabled');
 	}
-} catch {
-	console.warn('Entity map not found, wiki linking will be disabled');
+	}
 }
 
 // Cache validation helper
@@ -116,12 +121,17 @@ function clearExpiredCache(): void {
  * @param category - The category name (characters, locations, etc.)
  * @returns Array of entry objects with metadata
  */
-export function getAllEntries(category: CategoryType): EntryListItem[] {
+export async function getAllEntries(category: CategoryType): Promise<EntryListItem[]> {
 	const cacheKey = `category-${category}`;
 
 	// Check cache first
 	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
-		return serverCache.get(cacheKey);
+		return serverCache.get(cacheKey) as EntryListItem[];
+	}
+
+	// Initialize entity map if not loaded
+	if (Object.keys(entityMap).length === 0) {
+		await loadEntityMap();
 	}
 
 	const categoryDir = path.join(LORE_CONTENT_DIR, category);
@@ -134,22 +144,25 @@ export function getAllEntries(category: CategoryType): EntryListItem[] {
 	}
 
 	try {
-		const files = fs.readdirSync(categoryDir).filter((file) => file.endsWith('.md'));
+		const files = await fs.promises.readdir(categoryDir);
+		const mdFiles = files.filter((file) => file.endsWith('.md'));
 
-		const entries = files
-			.map((file) => {
-				const filePath = path.join(categoryDir, file);
-				const content = fs.readFileSync(filePath, 'utf-8');
-				const metadata = extractFrontmatter(content);
+		const entriesPromises = mdFiles.map(async (file) => {
+			const filePath = path.join(categoryDir, file);
+			const content = await fs.promises.readFile(filePath, 'utf-8');
+			const metadata = extractFrontmatter(content);
 
-				return {
-					title: metadata.title || 'Untitled',
-					...metadata,
-					slug: path.basename(file, '.md'),
-					category
-				} as EntryListItem;
-			})
-			.sort((a, b) => (a.title || '').localeCompare(b.title || '')); // Sort for consistent ordering
+			return {
+				title: metadata.title || 'Untitled',
+				...metadata,
+				slug: path.basename(file, '.md'),
+				category
+			} as EntryListItem;
+		});
+
+		const entries = (await Promise.all(entriesPromises)).sort((a, b) =>
+			(a.title || '').localeCompare(b.title || '')
+		);
 
 		// Cache the result
 		serverCache.set(cacheKey, entries);
@@ -157,7 +170,9 @@ export function getAllEntries(category: CategoryType): EntryListItem[] {
 
 		return entries;
 	} catch (error) {
-		console.error(`Error loading entries for category ${category}:`, error);
+		if (process.env.NODE_ENV === 'development') {
+			console.error(`Error loading entries for category ${category}:`, error);
+		}
 		const emptyResult: EntryListItem[] = [];
 		serverCache.set(cacheKey, emptyResult);
 		cacheTimestamps.set(cacheKey, Date.now());
@@ -178,7 +193,7 @@ export async function getEntry(category: CategoryType, slug: string): Promise<En
 		return null;
 	}
 
-	const content = fs.readFileSync(filePath, 'utf-8');
+	const content = await fs.promises.readFile(filePath, 'utf-8');
 	const { frontmatter, body } = parseFrontmatter(content);
 
 	// Process wiki links in content first
@@ -202,12 +217,12 @@ export async function getEntry(category: CategoryType, slug: string): Promise<En
  * Get all entries across all categories
  * @returns Array of all entries
  */
-export function getAllEntriesFlat(): EntryListItem[] {
+export async function getAllEntriesFlat(): Promise<EntryListItem[]> {
 	const cacheKey = 'all-entries-flat';
 
 	// Check cache first
 	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
-		return serverCache.get(cacheKey);
+		return serverCache.get(cacheKey) as EntryListItem[];
 	}
 
 	// Clear expired cache periodically
@@ -223,7 +238,8 @@ export function getAllEntriesFlat(): EntryListItem[] {
 	];
 
 	try {
-		const allEntries = categories.flatMap((category) => getAllEntries(category));
+		const allEntriesArrays = await Promise.all(categories.map((category) => getAllEntries(category)));
+		const allEntries = allEntriesArrays.flat();
 
 		// Cache the result
 		serverCache.set(cacheKey, allEntries);
@@ -231,7 +247,9 @@ export function getAllEntriesFlat(): EntryListItem[] {
 
 		return allEntries;
 	} catch (error) {
-		console.error('Error loading all entries:', error);
+		if (process.env.NODE_ENV === 'development') {
+			console.error('Error loading all entries:', error);
+		}
 		return [];
 	}
 }
@@ -241,8 +259,8 @@ export function getAllEntriesFlat(): EntryListItem[] {
  * @param query - Search query
  * @returns Array of matching entries
  */
-export function searchEntries(query: string): EntryListItem[] {
-	const allEntries = getAllEntriesFlat();
+export async function searchEntries(query: string): Promise<EntryListItem[]> {
+	const allEntries = await getAllEntriesFlat();
 	const lowerQuery = query.toLowerCase();
 
 	return allEntries.filter(
@@ -256,8 +274,8 @@ export function searchEntries(query: string): EntryListItem[] {
  * Get a random entry
  * @returns Random entry object
  */
-export function getRandomEntry(): EntryListItem | undefined {
-	const allEntries = getAllEntriesFlat();
+export async function getRandomEntry(): Promise<EntryListItem | undefined> {
+	const allEntries = await getAllEntriesFlat();
 	if (allEntries.length === 0) return undefined;
 
 	const randomIndex = Math.floor(Math.random() * allEntries.length);
@@ -271,7 +289,7 @@ export function getRandomEntry(): EntryListItem | undefined {
  * @returns Array of entries that link to this entry
  */
 export async function getBacklinks(category: CategoryType, slug: string): Promise<EntryListItem[]> {
-	const allEntries = getAllEntriesFlat();
+	const allEntries = await getAllEntriesFlat();
 	const targetEntry = await getEntry(category, slug);
 
 	if (!targetEntry) return [];
@@ -322,7 +340,9 @@ function parseFrontmatter(content: string): FrontmatterResult {
 			body
 		};
 	} catch (error) {
-		console.error('Error parsing frontmatter:', error);
+		if (process.env.NODE_ENV === 'development') {
+			console.error('Error parsing frontmatter:', error);
+		}
 		return { frontmatter: { title: 'Untitled' }, body: content };
 	}
 }

@@ -5,8 +5,10 @@
 	import PWAManager from '$lib/components/pwa/PWAManager.svelte';
 	import PageTransition from '$lib/components/ui/PageTransition.svelte';
 	import ScrollToTop from '$lib/components/ui/ScrollToTop.svelte';
-	import ImageViewer from '$lib/components/ui/ImageViewer.svelte';
+	import LazyImageViewer from '$lib/components/lazy/LazyImageViewer.svelte';
 	import { initializeClientData } from '$lib/client-data.js';
+	import { RoutePreloader } from '$lib/utils/route-preloader.js';
+	import { BuildOptimizer } from '$lib/utils/build-optimizer.js';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { isFullscreen } from '$lib/stores';
@@ -22,6 +24,24 @@
 	onMount(() => {
 		if (data?.allEntries) {
 			initializeClientData(data.allEntries);
+
+			// Initialize all performance optimizations
+			const buildOptimizer = BuildOptimizer.getInstance();
+			const routePreloader = RoutePreloader.getInstance();
+
+			// Auto-initialize all optimizations
+			buildOptimizer.initializeOptimizations().catch(() => {});
+
+			// Preload likely components based on current route
+			const currentRoute = $page.route?.id || '';
+			if (currentRoute === '/') {
+				routePreloader.preloadComponents(['LazyLoreCard']).catch(() => {});
+			}
+
+			// Listen for service worker updates
+			window.addEventListener('sw-update-available', () => {
+				console.log('App update available - refresh to get latest version');
+			});
 		}
 
 		const unsubscribe = isFullscreen.subscribe((value) => {
@@ -64,7 +84,13 @@
 
 	<PageTransition>
 		<main bind:this={mainContent} class="container mx-auto px-4 py-8">
-			{@render children()}
+			{#await data.allEntries}
+				<div class="loading-container">
+					<p>Загрузка Азарии...</p>
+				</div>
+			{:then}
+				{@render children()}
+			{/await}
 		</main>
 	</PageTransition>
 
@@ -72,7 +98,7 @@
 	<InstallPrompt />
 	<ScrollToTop />
 
-	<ImageViewer />
+	<LazyImageViewer />
 
 	<footer class="main-footer">
 		<div class="container mx-auto px-4 py-8 text-center">
@@ -83,6 +109,14 @@
 </div>
 
 <style>
+	.loading-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		font-size: 2rem;
+		color: #c9a876;
+	}
 	.background-container {
 		min-height: 100vh;
 		background-color: #1a1a1a;

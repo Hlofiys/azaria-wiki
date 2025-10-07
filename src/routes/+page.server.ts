@@ -40,7 +40,9 @@ export const load: PageServerLoad<PageData> = async () => {
 			totalEntries: allEntries.length
 		};
 	} catch (error) {
-		console.error('Error loading homepage data:', error);
+		if (process.env.NODE_ENV === 'development') {
+			console.error('Error loading homepage data:', error);
+		}
 		return {
 			featuredEntries: [],
 			slotMachineEntries: [],

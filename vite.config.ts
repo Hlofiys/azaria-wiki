@@ -124,25 +124,28 @@ export default defineConfig({
 					// Group node_modules into vendor chunk
 					if (id.includes('node_modules')) {
 						if (id.includes('@iconify')) return 'icons';
-						if (id.includes('daisyui')) return 'ui';
+						if (id.includes('daisyui') || id.includes('tailwind')) return 'ui';
+						if (id.includes('marked') || id.includes('yaml')) return 'content';
+						if (id.includes('svelte')) return 'framework';
 						return 'vendor';
 					}
+					
+					// Group app code by feature - avoid conflicts with SvelteKit's static imports
+					if (id.includes('/lib/components/lazy/')) return 'lazy-components';
+					if (id.includes('/lib/components/')) return 'components';
+					if (id.includes('/lib/optimizations/')) return 'performance'; // Merge with performance chunk
+					if (id.includes('/lib/utils/') && !id.includes('route-preloader')) return 'utils';
+					if (id.includes('/lib/server/')) return 'server';
+					if (id.includes('/lib/cache/') || id.includes('/lib/performance/')) return 'performance';
+					
+					// Don't chunk route pages - let SvelteKit handle them
+					// This prevents the dynamic import warnings
 				}
 			}
 		},
 
 		// ESBuild options for aggressive optimization
 		target: 'es2020',
-
-		// Additional esbuild settings
-		esbuild: {
-			drop: ['console', 'debugger'],
-			minifyIdentifiers: true,
-			minifySyntax: true,
-			minifyWhitespace: true,
-			treeShaking: true,
-			legalComments: 'none'
-		},
 
 		// Source maps for production debugging
 		sourcemap: false,

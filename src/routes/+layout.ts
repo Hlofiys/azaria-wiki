@@ -1,2 +1,2 @@
-// Enable prerendering for all pages
-export const prerender = true;
+// Disable prerendering to fix infinite loading issue with streamed data
+export const prerender = false;

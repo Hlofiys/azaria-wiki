@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LoreCard from '$lib/components/ui/LoreCard.svelte';
+	import LazyLoreCard from '$lib/components/lazy/LazyLoreCard.svelte';
 	import { Icon, getCategoryIcon, getUIIcon, getCategoryColors } from '$lib/icons';
 	import { resolve } from '$app/paths';
 	import type { EntryListItem } from '$lib/server/lore-parser';
@@ -249,7 +249,7 @@
 					</h3>
 					<div class="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
 						{#each slotResults as entry (entry.slug)}
-							<LoreCard {entry} showCategory={true} />
+							<LazyLoreCard {entry} showCategory={true} />
 						{/each}
 					</div>
 				</div>

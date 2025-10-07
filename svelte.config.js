@@ -35,11 +35,18 @@ const config = {
 				// Throw for other errors
 				throw new Error(message);
 			},
+			// Handle unseen routes (dynamic routes that aren't discovered during crawling)
+			handleUnseenRoutes: 'ignore', // Changed from 'warn' to 'ignore' for cleaner builds
 			// Optimize prerendering
 			handleMissingId: 'warn',
 			handleEntryGeneratorMismatch: 'warn',
 			// Concurrency for faster builds
-			concurrency: 10
+			concurrency: 10,
+			// Specify which routes to prerender explicitly
+			entries: [
+				'*', // Prerender all discoverable routes
+				// Note: [category]/[slug] routes are dynamic and will be generated at runtime
+			]
 		},
 
 		// Service worker for caching

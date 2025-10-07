@@ -30,7 +30,7 @@ export const load: PageServerLoad<PageData> = async ({ params }) => {
 	const typedCategory = category as CategoryType;
 
 	try {
-		const entries = getAllEntries(typedCategory);
+		const entries = await getAllEntries(typedCategory);
 		const categoryInfo = getCategoryInfo(typedCategory);
 
 		return {

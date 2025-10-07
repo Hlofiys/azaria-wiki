@@ -3,7 +3,7 @@ import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async () => {
 	// Get all entries for client-side functionality
-	const allEntries = getAllEntriesFlat();
+	const allEntries = await getAllEntriesFlat();
 
 	return {
 		allEntries

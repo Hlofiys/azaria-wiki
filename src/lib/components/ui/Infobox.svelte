@@ -49,11 +49,13 @@
 			<!-- Main Image -->
 			{#if entry.image}
 				<div class="image-container mb-3 md:mb-4">
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
 					<img
 						src={entry.image}
 						alt={entry.title}
-						class="main-image w-full rounded-lg object-cover"
+						class="main-image w-full rounded-lg object-cover cursor-pointer"
 						style="
 							max-height: 200px;
 							border: 2px solid {colors.border}60;
@@ -61,6 +63,9 @@
 						"
 						loading="lazy"
 						onclick={openImage}
+						onkeydown={(e) => e.key === 'Enter' && openImage()}
+						tabindex="0"
+						role="button"
 						onerror={(e) => {
 							// Hide image if it fails to load
 							const target = e.target as HTMLImageElement;

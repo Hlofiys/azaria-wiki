@@ -2,11 +2,12 @@
 import type { EntryListItem } from './server/lore-parser.js';
 import type { CategoryType } from './icons.js';
 import { cachedSearch, warmCache } from './cache/lore-cache.js';
+import { OptimizedSearchIndex } from './utils/optimized-search.js';
 
 // Data storage
 let allEntries: EntryListItem[] = [];
 const entriesByCategory: Map<CategoryType, EntryListItem[]> = new Map();
-const searchIndex: Map<string, Set<number>> = new Map(); // word -> entry indices
+let searchIndex: OptimizedSearchIndex | null = null;
 let isIndexed = false;
 
 /**
@@ -32,7 +33,11 @@ export function initializeClientData(entries: EntryListItem[]) {
 	});
 
 	// Build search index asynchronously
-	setTimeout(() => buildSearchIndex(), 0);
+	if (typeof window !== 'undefined') {
+		requestIdleCallback(() => buildSearchIndex(), { timeout: 1000 });
+	} else {
+		setTimeout(() => buildSearchIndex(), 0);
+	}
 
 	// Warm cache
 	warmCache(entries);
@@ -42,53 +47,15 @@ export function initializeClientData(entries: EntryListItem[]) {
  * Build search index for faster searching
  */
 function buildSearchIndex() {
-	if (isIndexed) return;
+	if (isIndexed || allEntries.length === 0) return;
 
-	searchIndex.clear();
-
-	allEntries.forEach((entry, index) => {
-		// Index title words
-		const titleWords = (entry.title || '').toLowerCase().split(/\s+/);
-		titleWords.forEach((word) => {
-			if (word.length > 1) {
-				if (!searchIndex.has(word)) {
-					searchIndex.set(word, new Set());
-				}
-				searchIndex.get(word)!.add(index);
-			}
-		});
-
-		// Index tags
-		if (entry.tags) {
-			entry.tags.forEach((tag) => {
-				const tagWords = tag.toLowerCase().split(/\s+/);
-				tagWords.forEach((word) => {
-					if (word.length > 1) {
-						if (!searchIndex.has(word)) {
-							searchIndex.set(word, new Set());
-						}
-						searchIndex.get(word)!.add(index);
-					}
-				});
-			});
-		}
-
-		// Index metadata
-		const metadata = [entry.faction, entry.type, entry.status].filter(Boolean);
-		metadata.forEach((meta) => {
-			const words = meta!.toLowerCase().split(/\s+/);
-			words.forEach((word) => {
-				if (word.length > 1) {
-					if (!searchIndex.has(word)) {
-						searchIndex.set(word, new Set());
-					}
-					searchIndex.get(word)!.add(index);
-				}
-			});
-		});
-	});
-
-	isIndexed = true;
+	try {
+		searchIndex = new OptimizedSearchIndex(allEntries);
+		isIndexed = true;
+	} catch (error) {
+		console.error('Failed to build search index:', error);
+		isIndexed = false;
+	}
 }
 
 /**
@@ -103,6 +70,88 @@ export function getAllEntries(): EntryListItem[] {
  */
 export function getEntriesByCategory(category: CategoryType): EntryListItem[] {
 	return entriesByCategory.get(category) || [];
+}
+
+/**
+ * Simple search fallback when optimized search is not available
+ */
+function simpleSearch(query: string): EntryListItem[] {
+	const lowerQuery = query.toLowerCase().trim();
+	if (lowerQuery.length < 2) return [];
+
+	const queryWords = lowerQuery.split(/\s+/).filter(word => word.length > 1);
+	const results: Array<{ entry: EntryListItem; score: number }> = [];
+
+	allEntries.forEach(entry => {
+		const score = calculateRelevanceScore(entry, lowerQuery, queryWords);
+		if (score > 0) {
+			results.push({ entry, score });
+		}
+	});
+
+	return results
+		.sort((a, b) => b.score - a.score)
+		.slice(0, 20)
+		.map(r => r.entry);
+}
+
+/**
+ * Calculate relevance score for search results
+ */
+function calculateRelevanceScore(entry: EntryListItem, query: string, queryWords: string[]): number {
+	let score = 0;
+	const title = (entry.title || '').toLowerCase();
+
+	// Title matching (highest priority)
+	if (title === query) {
+		score += 100;
+	} else if (title.includes(query)) {
+		score += 50;
+		if (title.startsWith(query)) {
+			score += 25;
+		}
+	}
+
+	// Individual word matching in title
+	queryWords.forEach((word) => {
+		if (title.includes(word)) {
+			score += 15;
+		}
+	});
+
+	// Tag matching
+	if (entry.tags) {
+		entry.tags.forEach((tag) => {
+			const tagLower = tag.toLowerCase();
+			if (tagLower === query) {
+				score += 30;
+			} else if (tagLower.includes(query)) {
+				score += 15;
+			}
+
+			queryWords.forEach((word) => {
+				if (tagLower.includes(word)) {
+					score += 8;
+				}
+			});
+		});
+	}
+
+	// Metadata matching
+	const metadata = [entry.faction, entry.type, entry.status].filter(Boolean);
+	metadata.forEach((meta) => {
+		const metaLower = meta!.toLowerCase();
+		if (metaLower.includes(query)) {
+			score += 10;
+		}
+		queryWords.forEach((word) => {
+			if (metaLower.includes(word)) {
+				score += 5;
+			}
+		});
+	});
+
+	return score;
 }
 
 /**
@@ -128,136 +177,22 @@ export function searchEntries(query: string): EntryListItem[] {
  * Index-based search for better performance
  */
 function indexedSearch(query: string): EntryListItem[] {
-	const lowerQuery = query.toLowerCase().trim();
-	const queryWords = lowerQuery.split(/\s+/).filter((word) => word.length > 1);
-
-	if (queryWords.length === 0) return [];
-
-	// Find entries that match any query word
-	const matchingIndices = new Set<number>();
-
-	queryWords.forEach((word) => {
-		// Exact word matches
-		if (searchIndex.has(word)) {
-			searchIndex.get(word)!.forEach((index) => matchingIndices.add(index));
-		}
-
-		// Partial word matches
-		for (const [indexedWord, indices] of searchIndex.entries()) {
-			if (indexedWord.includes(word) || word.includes(indexedWord)) {
-				indices.forEach((index) => matchingIndices.add(index));
-			}
-		}
-	});
-
-	// Convert indices to entries and rank them
-	const results: Array<{ entry: EntryListItem; score: number }> = [];
-
-	matchingIndices.forEach((index) => {
-		const entry = allEntries[index];
-		if (entry) {
-			const score = calculateRelevanceScore(entry, lowerQuery, queryWords);
-			if (score > 0) {
-				results.push({ entry, score });
-			}
-		}
-	});
-
-	// Sort by relevance and return top results
-	return results
-		.sort((a, b) => b.score - a.score)
-		.slice(0, 20)
-		.map((r) => r.entry);
-}
-
-/**
- * Calculate relevance score for search results
- */
-function calculateRelevanceScore(
-	entry: EntryListItem,
-	query: string,
-	queryWords: string[]
-): number {
-	let score = 0;
-	const title = (entry.title || '').toLowerCase();
-
-	// Exact title match
-	if (title === query) {
-		score += 100;
-	} else if (title.includes(query)) {
-		score += 50;
-		// Bonus for match at start
-		if (title.startsWith(query)) {
-			score += 25;
+	// Use the OptimizedSearchIndex if available
+	if (searchIndex && isIndexed) {
+		try {
+			const results = searchIndex.search(query, 20);
+			return results.map(result => result.entry);
+		} catch (error) {
+			console.error('Optimized search failed, falling back to simple search:', error);
+			return simpleSearch(query);
 		}
 	}
 
-	// Word matches in title
-	queryWords.forEach((word) => {
-		if (title.includes(word)) {
-			score += 20;
-			if (title.startsWith(word)) {
-				score += 10;
-			}
-		}
-	});
-
-	// Tag matches
-	if (entry.tags) {
-		entry.tags.forEach((tag) => {
-			const tagLower = tag.toLowerCase();
-			if (tagLower === query) {
-				score += 30;
-			} else if (tagLower.includes(query)) {
-				score += 15;
-			}
-
-			queryWords.forEach((word) => {
-				if (tagLower.includes(word)) {
-					score += 10;
-				}
-			});
-		});
-	}
-
-	// Metadata matches
-	const metadata = [entry.faction, entry.type, entry.status].filter(Boolean);
-	metadata.forEach((meta) => {
-		const metaLower = meta!.toLowerCase();
-		if (metaLower.includes(query)) {
-			score += 15;
-		}
-		queryWords.forEach((word) => {
-			if (metaLower.includes(word)) {
-				score += 5;
-			}
-		});
-	});
-
-	return score;
+	// Fallback to simple search if index not ready
+	return simpleSearch(query);
 }
 
-/**
- * Simple search fallback
- */
-function simpleSearch(query: string): EntryListItem[] {
-	const lowerQuery = query.toLowerCase().trim();
-	if (lowerQuery.length < 2) return [];
 
-	return allEntries
-		.filter((entry) => {
-			const title = (entry.title || '').toLowerCase();
-			const tags = entry.tags || [];
-
-			return (
-				title.includes(lowerQuery) ||
-				tags.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
-				(entry.faction && entry.faction.toLowerCase().includes(lowerQuery)) ||
-				(entry.type && entry.type.toLowerCase().includes(lowerQuery))
-			);
-		})
-		.slice(0, 20);
-}
 
 /**
  * Get a random entry (optimized)
@@ -293,6 +228,6 @@ export function getDataStats() {
 			{} as Record<CategoryType, number>
 		),
 		isIndexed,
-		indexSize: searchIndex.size
+		indexStats: searchIndex?.getStats() || null
 	};
 }

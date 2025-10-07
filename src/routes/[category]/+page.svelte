@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LoreCard from '$lib/components/ui/LoreCard.svelte';
+	import LazyLoreCard from '$lib/components/lazy/LazyLoreCard.svelte';
 	import { page } from '$app/stores';
 	import { Icon, getCategoryIcon, getUIIcon, getCategoryColors } from '$lib/icons';
 	import { onMount } from 'svelte';
@@ -192,7 +192,7 @@
 						transition-delay: {800 + index * 100}ms;
 					"
 				>
-					<LoreCard {entry} showCategory={false} />
+					<LazyLoreCard {entry} showCategory={false} />
 				</div>
 			{/each}
 		</div>

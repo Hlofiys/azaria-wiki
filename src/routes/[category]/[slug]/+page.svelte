@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Infobox from '$lib/components/ui/Infobox.svelte';
+	import LazyInfobox from '$lib/components/lazy/LazyInfobox.svelte';
 	import LoreCard from '$lib/components/ui/LoreCard.svelte';
 	import { Icon, getUIIcon } from '$lib/icons';
 	import { resolve } from '$app/paths';
@@ -76,7 +76,7 @@
 
 		<!-- Sidebar with Infobox -->
 		<div class="order-1 lg:order-2">
-			<Infobox entry={data.entry.metadata} backlinks={data.backlinks} />
+<LazyInfobox entry={data.entry.metadata} backlinks={data.backlinks} />
 		</div>
 	</div>
 
