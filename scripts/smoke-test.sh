@@ -98,6 +98,20 @@ else
 	fail=1
 fi
 
+echo "▶ Healthcheck образа (регресс: wget на 'localhost' уходил в IPv6 и контейнер становился unhealthy)"
+hs="none"
+for _ in $(seq 1 20); do
+	hs=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$CONTAINER" 2>/dev/null || echo none)
+	[ "$hs" = "healthy" ] && break
+	sleep 3
+done
+if [ "$hs" = "healthy" ]; then
+	echo "  ✓ контейнер дошёл до healthy"
+else
+	echo "  ✗ статус health: $hs (ожидался healthy; проверьте HEALTHCHECK в Dockerfile и /health)"
+	fail=1
+fi
+
 if [ "$fail" = "0" ]; then
 	echo "✅ Все проверки пройдены"
 else
