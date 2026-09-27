@@ -31,8 +31,12 @@ export function initializeClientData(entries: EntryListItem[]) {
 		entriesByCategory.set(category, categoryEntries);
 	});
 
-	// Build search index asynchronously
-	setTimeout(() => buildSearchIndex(), 0);
+	// Build search index asynchronously — in idle time when the browser supports it
+	if (typeof requestIdleCallback === 'function') {
+		requestIdleCallback(() => buildSearchIndex(), { timeout: 1000 });
+	} else {
+		setTimeout(() => buildSearchIndex(), 0);
+	}
 
 	// Warm cache
 	warmCache(entries);
