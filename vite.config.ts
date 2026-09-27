@@ -19,8 +19,8 @@ export default defineConfig({
 				short_name: 'Азария Вики',
 				description:
 					'Исследуйте мир Азарии - уникальную медивал-деп-панк вселенную, где средневековье встречается с философией азарта и удачи.',
-				theme_color: '#c9a876',
-				background_color: '#1a1a1a',
+				theme_color: '#17121b',
+				background_color: '#17121b',
 				display: 'standalone',
 				orientation: 'portrait-primary',
 				scope: '/',

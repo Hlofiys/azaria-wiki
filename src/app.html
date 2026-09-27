@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<!-- PWA Meta Tags -->
-		<meta name="theme-color" content="#c9a876" />
-		<meta name="background-color" content="#1a1a1a" />
+		<meta name="theme-color" content="#17121b" />
+		<meta name="background-color" content="#17121b" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="apple-mobile-web-app-title" content="Азария Вики" />
@@ -20,49 +20,78 @@
 		<!-- Apple Touch Icons -->
 		<link rel="apple-touch-icon" sizes="192x192" href="/pwa-192x192.png" />
 		<link rel="apple-touch-icon" sizes="512x512" href="/pwa-512x512.png" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+		<!-- Self-hosted fonts (Prata / Lora / IBM Plex Mono) -->
 		<link
-			href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
-			rel="stylesheet"
+			rel="preload"
+			href="/fonts/prata-cyrillic.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
 		/>
+		<link
+			rel="preload"
+			href="/fonts/prata-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="preload"
+			href="/fonts/lora-cyrillic.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="preload"
+			href="/fonts/lora-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="preload"
+			href="/fonts/ibm-plex-mono-400-cyrillic.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="preload"
+			href="/fonts/ibm-plex-mono-400-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+
 		<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-		<script>
-			// Preload the MDI icon set
-			if (typeof Iconify !== 'undefined') {
-				Iconify.preloadBundle('https://api.iconify.design/mdi.json');
-			}
-		</script>
 		<style>
-			/* Critical CSS to prevent FOUC */
+			/* Critical CSS to prevent FOUC — mirrors the tokens in src/app.css */
+			html {
+				background-color: #17121b;
+				color-scheme: dark;
+			}
 			body {
-				background-color: #1a1a1a !important;
-				color: #d0d0d0 !important;
-				font-family: 'Lora', serif !important;
 				margin: 0;
-				padding: 0;
+				background-color: #17121b;
+				color: #ede3d1;
+				font-family: 'Lora', Georgia, serif;
 			}
 			h1,
-			h2,
-			h3,
-			h4,
-			h5,
-			h6 {
-				color: #c9a876 !important;
-				font-family: 'Cinzel Decorative', serif !important;
+			h2 {
+				color: #ede3d1;
+				font-family: 'Prata', 'Lora', Georgia, serif;
+				font-weight: 400;
 			}
 			a {
-				color: #c9a876 !important;
-				text-decoration: none !important;
+				color: #c9a876;
+				text-decoration: none;
 			}
 		</style>
 		%sveltekit.head%
 	</head>
-	<body
-		data-sveltekit-preload-data="hover"
-		data-theme="azaria"
-		style="background-color: #1a1a1a; color: #d0d0d0; font-family: 'Lora', serif"
-	>
+	<body data-sveltekit-preload-data="hover" data-theme="azaria">
 		<div style="display: contents">%sveltekit.body%</div>
 		<script>
 			if (window.netlifyIdentity) {

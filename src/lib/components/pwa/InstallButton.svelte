@@ -63,13 +63,8 @@
 
 <!-- Install Button (appears in header for testing) -->
 {#if showButton && !isInstalled && deferredPrompt}
-	<button
-		on:click={handleInstall}
-		class="azaria-btn flex items-center gap-1 text-xs"
-		style="padding: 0.375rem 0.75rem;"
-		title="Установить как приложение"
-	>
+	<button on:click={handleInstall} class="btn btn--sm w-full" title="Установить как приложение">
 		<Icon icon="mdi:download" class="h-4 w-4" />
-		<span class="hidden sm:inline">Установить</span>
+		<span>Установить</span>
 	</button>
 {/if}

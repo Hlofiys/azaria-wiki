@@ -1,17 +1,24 @@
-import Icon from '@iconify/svelte';
+import Icon, { addCollection } from '@iconify/svelte';
+import { iconCollections } from './icons/collection';
 
-// Type definitions
-export interface CategoryColors {
-	primary: string;
-	secondary: string;
-	accent: string;
-	border: string;
-	bg: string;
-	glow: string;
+// Icons are baked in at build time (scripts/generate-icons.mjs) — no runtime API calls.
+for (const collection of iconCollections) {
+	addCollection(collection);
 }
 
-export type CategoryType =
-	'characters' | 'locations' | 'factions' | 'artifacts' | 'concepts' | 'creatures';
+export {
+	CATEGORY_ORDER,
+	categoryIcons,
+	categoryNames,
+	categoryDescriptions,
+	categorySectionLabels,
+	getCategoryIcon,
+	getCategoryName,
+	getCategoryDescription,
+	getCategorySectionLabel,
+	entryFolio,
+	type CategoryType
+} from '$lib/utils/categories';
 
 export type UIIconType =
 	| 'book'
@@ -31,69 +38,14 @@ export type UIIconType =
 	| 'close'
 	| 'zoom-in'
 	| 'zoom-out'
-	| 'zoom-reset';
-
-// Category icon mappings using Iconify icons
-export const categoryIcons: Record<CategoryType, string> = {
-	characters: 'mdi:crown',
-	locations: 'mdi:castle',
-	factions: 'mdi:sword-cross',
-	artifacts: 'mdi:star-circle',
-	concepts: 'mdi:target',
-	creatures: 'game-icons:sea-dragon'
-};
-
-// Category color mappings for visual distinction
-export const categoryColors: Record<CategoryType, CategoryColors> = {
-	characters: {
-		primary: '#FFD700', // Royal gold
-		secondary: '#F4D03F', // Light gold
-		accent: '#B7950B', // Dark gold
-		border: '#FFD700',
-		bg: 'rgba(255, 215, 0, 0.1)',
-		glow: 'rgba(255, 215, 0, 0.3)'
-	},
-	locations: {
-		primary: '#5DADE2', // Castle blue
-		secondary: '#AED6F1', // Light blue
-		accent: '#2E86AB', // Dark blue
-		border: '#5DADE2',
-		bg: 'rgba(93, 173, 226, 0.1)',
-		glow: 'rgba(93, 173, 226, 0.3)'
-	},
-	factions: {
-		primary: '#E74C3C', // War red
-		secondary: '#F1948A', // Light red
-		accent: '#C0392B', // Dark red
-		border: '#E74C3C',
-		bg: 'rgba(231, 76, 60, 0.1)',
-		glow: 'rgba(231, 76, 60, 0.3)'
-	},
-	artifacts: {
-		primary: '#AF7AC5', // Mystic purple
-		secondary: '#D7BDE2', // Light purple
-		accent: '#8E44AD', // Dark purple
-		border: '#AF7AC5',
-		bg: 'rgba(175, 122, 197, 0.1)',
-		glow: 'rgba(175, 122, 197, 0.3)'
-	},
-	concepts: {
-		primary: '#58D68D', // Philosophy green
-		secondary: '#A9DFBF', // Light green
-		accent: '#27AE60', // Dark green
-		border: '#58D68D',
-		bg: 'rgba(88, 214, 141, 0.1)',
-		glow: 'rgba(88, 214, 141, 0.3)'
-	},
-	creatures: {
-		primary: '#F39C12', // Dragon orange
-		secondary: '#F8C471', // Light orange
-		accent: '#E67E22', // Dark orange
-		border: '#F39C12',
-		bg: 'rgba(243, 156, 18, 0.1)',
-		glow: 'rgba(243, 156, 18, 0.3)'
-	}
-};
+	| 'zoom-reset'
+	| 'menu'
+	| 'shuffle'
+	| 'arrow-up'
+	| 'arrow-right'
+	| 'scale'
+	| 'scroll'
+	| 'coin';
 
 // UI element icon mappings
 export const uiIcons: Record<UIIconType, string> = {
@@ -114,44 +66,19 @@ export const uiIcons: Record<UIIconType, string> = {
 	close: 'mdi:close',
 	'zoom-in': 'mdi:magnify-plus',
 	'zoom-out': 'mdi:magnify-minus',
-	'zoom-reset': 'mdi:magnify-scan'
+	'zoom-reset': 'mdi:magnify-scan',
+	menu: 'mdi:menu',
+	shuffle: 'mdi:shuffle-variant',
+	'arrow-up': 'mdi:arrow-up',
+	'arrow-right': 'mdi:arrow-right',
+	scale: 'mdi:scale-balance',
+	scroll: 'mdi:script-text-outline',
+	coin: 'mdi:circle-multiple-outline'
 };
-
-// Get category icon name
-export function getCategoryIcon(category: CategoryType): string {
-	return categoryIcons[category] || uiIcons.book;
-}
-
-// Get category colors
-export function getCategoryColors(category: CategoryType): CategoryColors {
-	return (
-		categoryColors[category] || {
-			primary: '#c9a876',
-			secondary: '#e6c190',
-			accent: '#b8956a',
-			border: '#c9a876',
-			bg: 'rgba(201, 168, 118, 0.1)',
-			glow: 'rgba(201, 168, 118, 0.3)'
-		}
-	);
-}
 
 // Get UI icon name
 export function getUIIcon(iconName: UIIconType): string {
 	return uiIcons[iconName] || uiIcons.book;
-}
-
-// Get Russian category name
-export function getCategoryNameRussian(category: CategoryType): string {
-	const russianNames: Record<CategoryType, string> = {
-		characters: 'Персонажи',
-		locations: 'Локации',
-		factions: 'Фракции',
-		artifacts: 'Артефакты',
-		concepts: 'Концепции',
-		creatures: 'Существа'
-	};
-	return russianNames[category] || category;
 }
 
 // Icon component wrapper for easy usage

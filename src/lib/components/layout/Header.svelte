@@ -3,36 +3,67 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import Icon from '@iconify/svelte';
-	import { getCategoryColors, getCategoryIcon } from '$lib/icons';
-	import type { CategoryType } from '$lib/icons';
+	import { getCategoryIcon, getUIIcon } from '$lib/icons';
+	import { CATEGORY_ORDER, categoryNames } from '$lib/utils/categories';
 	import { getRandomEntry } from '$lib/client-data.js';
 	import InstallButton from '$lib/components/pwa/InstallButton.svelte';
+	import { onMount } from 'svelte';
 
-	export let extraClass = '';
+	interface Props {
+		extraClass?: string;
+	}
 
-	let searchQuery = '';
+	let { extraClass = '' }: Props = $props();
 
-	// Navigation items with their categories for coloring
-	const navItems: Array<{ href: string; category: CategoryType; label: string }> = [
-		{ href: '/characters', category: 'characters', label: 'Персонажи' },
-		{ href: '/locations', category: 'locations', label: 'Локации' },
-		{ href: '/factions', category: 'factions', label: 'Фракции' },
-		{ href: '/artifacts', category: 'artifacts', label: 'Артефакты' },
-		{ href: '/concepts', category: 'concepts', label: 'Концепции' },
-		{ href: '/creatures', category: 'creatures', label: 'Существа' }
-	];
+	let searchQuery = $state('');
+	let searchInput: HTMLInputElement;
+	let drawerOpen = $state(false);
+	let menuOpen = $state(false);
+	let scrolled = $state(false);
 
-	async function handleSearch() {
+	onMount(() => {
+		const onScroll = () => (scrolled = window.scrollY > 8);
+		onScroll();
+		window.addEventListener('scroll', onScroll, { passive: true });
+
+		const onKeydown = (event: KeyboardEvent) => {
+			const target = event.target as HTMLElement | null;
+			const typing =
+				target instanceof HTMLInputElement ||
+				target instanceof HTMLTextAreaElement ||
+				target?.isContentEditable;
+
+			if (event.key === '/' && !typing) {
+				event.preventDefault();
+				searchInput?.focus();
+			}
+			if (event.key === 'Escape') {
+				drawerOpen = false;
+				menuOpen = false;
+			}
+		};
+		window.addEventListener('keydown', onKeydown);
+
+		return () => {
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('keydown', onKeydown);
+		};
+	});
+
+	function handleSearch() {
 		if (searchQuery.trim()) {
 			goto(resolve(`/search?q=${encodeURIComponent(searchQuery)}`));
+			drawerOpen = false;
 		}
 	}
 
 	function randomArticle() {
 		try {
-			const randomEntry = getRandomEntry();
-			if (randomEntry) {
-				goto(resolve(`/${randomEntry.category}/${randomEntry.slug}`));
+			const entry = getRandomEntry();
+			if (entry) {
+				menuOpen = false;
+				drawerOpen = false;
+				goto(resolve(`/${entry.category}/${entry.slug}`));
 			}
 		} catch (error) {
 			console.error('Error getting random article:', error);
@@ -42,204 +73,195 @@
 
 <header
 	id="main-header"
-	class="rounded-lg border-b-2 {extraClass}"
-	style="
-		background: linear-gradient(145deg, rgba(36, 36, 36, 0.9) 0%, rgba(42, 42, 42, 0.9) 100%);
-		border-bottom-color: #c9a876;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-	"
+	data-scrolled={scrolled}
+	class="sticky top-0 z-40 border-b border-line bg-ink-850/80 backdrop-blur-md {extraClass}"
 >
-	<div class="container mx-auto px-4 py-4">
-		<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-			<!-- Logo and Title -->
-			<div class="flex items-center justify-center space-x-4 md:justify-start">
-				<a
-					href={resolve('/')}
-					class="flex items-center space-x-3 transition-opacity hover:opacity-80"
+	<div class="mx-auto max-w-7xl px-4">
+		<div class="flex h-[68px] items-center gap-3">
+			<!-- Wordmark -->
+			<a href={resolve('/')} class="flex items-center gap-3" aria-label="Азария — на главную">
+				<span
+					class="grid size-[34px] rotate-45 place-items-center border border-line-strong bg-ink-800"
 				>
-					<Icon icon="mdi:slot-machine" class="text-azaria-gold text-3xl md:text-4xl" />
-					<div>
-						<h1
-							style="font-size: 1.5rem; font-family: 'Cinzel Decorative', serif; font-weight: bold; color: #c9a876;"
-						>
-							Азария
-						</h1>
-						<p
-							style="font-size: 0.75rem; color: rgba(208, 208, 208, 0.7); font-family: 'Lora', serif;"
-						>
-							Медивал-деп-панк вики
-						</p>
-					</div>
-				</a>
-			</div>
-
-			<!-- Desktop Navigation -->
-			<nav class="hidden items-center space-x-6 md:flex">
-				{#each navItems as item (item.href)}
-					{@const colors = getCategoryColors(item.category)}
-					{@const isActive = $page.url.pathname.startsWith(item.href)}
-					<a
-						href={resolve(item.href as `/${string}`)}
-						class="nav-link hover:bg-opacity-10 rounded px-2 py-1 transition-all duration-300 hover:scale-105"
-						class:active={isActive}
-						class:nav-active={isActive}
-						style="
-							color: {isActive ? colors.primary : '#d0d0d0'};
-							text-shadow: {isActive ? `0 0 4px ${colors.glow}` : 'none'};
-							--hover-bg: {colors.bg};
-						"
-						on:mouseenter={(e) => {
-							e.currentTarget.style.backgroundColor = colors.bg;
-							e.currentTarget.style.boxShadow = `0 0 8px ${colors.glow}`;
-						}}
-						on:mouseleave={(e) => {
-							if (!isActive) {
-								e.currentTarget.style.backgroundColor = 'transparent';
-								e.currentTarget.style.boxShadow = 'none';
-							}
-						}}
+					<Icon icon={getUIIcon('slot')} width="17" class="-rotate-45 text-brass" />
+				</span>
+				<span class="leading-none">
+					<span class="block font-display text-xl text-parchment">Азария</span>
+					<span class="eyebrow mt-0.5 hidden whitespace-nowrap sm:block">Медивал-деп-панк вики</span
 					>
-						<Icon
-							icon={getCategoryIcon(item.category)}
-							width="16"
-							class="mr-1 inline transition-colors duration-150"
-							style="color: {isActive ? colors.primary : colors.secondary} !important;"
-						/>
-						{item.label}
+				</span>
+			</a>
+
+			<!-- Desktop navigation -->
+			<nav class="ml-6 hidden items-center gap-5 lg:flex" aria-label="Разделы">
+				{#each CATEGORY_ORDER as category (category)}
+					{@const isActive = $page.url.pathname.startsWith(`/${category}`)}
+					<a
+						href={resolve(`/${category}` as `/${string}`)}
+						class="nav-link"
+						class:nav-link--active={isActive}
+						data-seal={category}
+						aria-current={isActive ? 'page' : undefined}
+					>
+						<Icon icon={getCategoryIcon(category)} width="14" class="seal-text" />
+						{categoryNames[category].plural}
 					</a>
 				{/each}
 			</nav>
 
-			<!-- Search, Install, and Actions -->
-			<div class="flex items-center justify-center space-x-2 md:justify-end md:space-x-4">
-				<!-- Install Button -->
-				<InstallButton />
-				<form on:submit|preventDefault={handleSearch} class="flex items-center">
-					<input
-						type="text"
-						bind:value={searchQuery}
-						placeholder="Поиск..."
-						class="azaria-input w-24 text-sm md:w-48"
+			<div class="ml-auto flex items-center gap-2">
+				<!-- Search -->
+				<form
+					onsubmit={(event) => {
+						event.preventDefault();
+						handleSearch();
+					}}
+					class="relative hidden sm:block"
+				>
+					<Icon
+						icon={getUIIcon('search')}
+						width="15"
+						class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-parchment-mute"
 					/>
-					<button type="submit" class="azaria-btn ml-1 md:ml-2" style="padding: 0.5rem 0.75rem;">
-						<Icon icon="mdi:magnify" width="16" />
-					</button>
+					<input
+						bind:this={searchInput}
+						bind:value={searchQuery}
+						class="input w-40 pr-10 pl-9 md:w-56"
+						type="search"
+						placeholder="Поиск…"
+						aria-label="Поиск по статьям"
+					/>
+					<kbd
+						class="folio pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 md:block"
+					>
+						/
+					</kbd>
 				</form>
 
 				<button
-					on:click={randomArticle}
-					class="azaria-btn"
-					style="padding: 0.5rem 0.75rem;"
-					title="Рулетка судьбы"
+					type="button"
+					class="icon-btn"
+					onclick={randomArticle}
+					title="Случайная запись"
+					aria-label="Случайная запись"
 				>
-					<Icon icon="mdi:dice-6" width="16" />
+					<Icon icon={getUIIcon('dice')} width="17" />
 				</button>
 
-				<a
-					href={resolve('/admin')}
-					class="azaria-btn"
-					style="padding: 0.5rem 0.75rem;"
-					title="Административная панель"
+				<!-- Overflow menu -->
+				<div class="relative hidden md:block">
+					<button
+						type="button"
+						class="icon-btn"
+						onclick={() => (menuOpen = !menuOpen)}
+						aria-expanded={menuOpen}
+						aria-haspopup="true"
+						title="Ещё"
+						aria-label="Ещё"
+					>
+						<Icon icon={getUIIcon('menu')} width="17" />
+					</button>
+					{#if menuOpen}
+						<div
+							class="frame absolute right-0 mt-2 w-56 p-2"
+							role="menu"
+							tabindex="-1"
+							onfocusout={(event) => {
+								if (!event.currentTarget.contains(event.relatedTarget as Node)) menuOpen = false;
+							}}
+						>
+							<div class="relative z-10 flex flex-col">
+								<a
+									role="menuitem"
+									href={resolve('/admin')}
+									class="px-3 py-2 text-sm text-parchment-dim hover:bg-ink-700/60 hover:text-brass-bright"
+								>
+									<Icon icon="mdi:cog" width="15" class="mr-2 inline" />
+									Служебный вход
+								</a>
+								<a
+									role="menuitem"
+									href={resolve('/search')}
+									class="px-3 py-2 text-sm text-parchment-dim hover:bg-ink-700/60 hover:text-brass-bright"
+								>
+									<Icon icon={getUIIcon('search')} width="15" class="mr-2 inline" />
+									Все записи
+								</a>
+								<div class="mt-1 border-t border-line px-1 pt-2">
+									<InstallButton />
+								</div>
+							</div>
+						</div>
+					{/if}
+				</div>
+
+				<!-- Mobile menu toggle -->
+				<button
+					type="button"
+					class="icon-btn lg:hidden"
+					onclick={() => (drawerOpen = !drawerOpen)}
+					aria-expanded={drawerOpen}
+					aria-controls="mobile-nav"
+					aria-label="Меню"
 				>
-					<Icon icon="mdi:cog" width="16" />
-				</a>
+					<Icon icon={drawerOpen ? getUIIcon('close') : getUIIcon('menu')} width="17" />
+				</button>
 			</div>
 		</div>
 
-		<!-- Mobile Navigation -->
-		<div class="mt-4 md:hidden">
-			<div class="grid grid-cols-2 gap-2 text-xs">
-				{#each navItems as item (item.href)}
-					{@const colors = getCategoryColors(item.category)}
-					{@const isActive = $page.url.pathname.startsWith(item.href)}
-					<a
-						href={resolve(item.href as `/${string}`)}
-						class="nav-link-mobile flex flex-col items-center justify-center p-2 transition-all duration-300 hover:scale-105"
-						class:active={isActive}
-						style="
-							color: {isActive ? colors.primary : '#d0d0d0'};
-							border: 1px solid {isActive ? colors.border : 'rgba(201, 168, 118, 0.2)'};
-							background: {isActive ? colors.bg : 'transparent'};
-							border-radius: 0.375rem;
-						"
-						on:mouseenter={(e) => {
-							e.currentTarget.style.backgroundColor = colors.bg;
-							e.currentTarget.style.borderColor = colors.border;
-							e.currentTarget.style.boxShadow = `0 0 8px ${colors.glow}`;
-						}}
-						on:mouseleave={(e) => {
-							if (!isActive) {
-								e.currentTarget.style.backgroundColor = 'transparent';
-								e.currentTarget.style.borderColor = 'rgba(201, 168, 118, 0.2)';
-								e.currentTarget.style.boxShadow = 'none';
-							}
-						}}
-					>
-						<Icon
-							icon={getCategoryIcon(item.category)}
-							width="16"
-							class="mb-1 transition-colors duration-150"
-							style="color: {isActive ? colors.primary : colors.secondary} !important;"
-						/>
-						<span class="text-center">{item.label}</span>
+		<!-- Mobile drawer -->
+		{#if drawerOpen}
+			<div id="mobile-nav" class="border-t border-line pb-4 lg:hidden">
+				<form
+					onsubmit={(event) => {
+						event.preventDefault();
+						handleSearch();
+					}}
+					class="relative mt-4 sm:hidden"
+				>
+					<Icon
+						icon={getUIIcon('search')}
+						width="15"
+						class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-parchment-mute"
+					/>
+					<input
+						bind:value={searchQuery}
+						class="input pl-9"
+						type="search"
+						placeholder="Поиск…"
+						aria-label="Поиск по статьям"
+					/>
+				</form>
+
+				<nav class="mt-4 grid gap-1" aria-label="Разделы">
+					{#each CATEGORY_ORDER as category (category)}
+						{@const isActive = $page.url.pathname.startsWith(`/${category}`)}
+						<a
+							href={resolve(`/${category}` as `/${string}`)}
+							class="flex items-center gap-3 border-b border-line px-2 py-3 text-parchment-dim hover:text-brass-bright"
+							class:text-brass-bright={isActive}
+							data-seal={category}
+							aria-current={isActive ? 'page' : undefined}
+						>
+							<Icon icon={getCategoryIcon(category)} width="16" class="seal-text" />
+							{categoryNames[category].plural}
+							{#if isActive}
+								<span class="folio ml-auto">вы здесь</span>
+							{/if}
+						</a>
+					{/each}
+				</nav>
+
+				<div class="mt-4 flex items-center gap-2">
+					<button type="button" class="btn flex-1" onclick={randomArticle}>
+						<Icon icon={getUIIcon('dice')} width="15" />
+						Спинануть судьбу
+					</button>
+					<a href={resolve('/admin')} class="btn btn--quiet">
+						<Icon icon="mdi:cog" width="15" />
 					</a>
-				{/each}
+				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
 </header>
-
-<style>
-	.nav-link {
-		color: #d0d0d0;
-		transition:
-			color 0.15s ease,
-			background-color 0.3s ease,
-			box-shadow 0.3s ease;
-		font-family: 'Lora', serif;
-	}
-
-	.nav-link:hover {
-		color: #c9a876;
-	}
-
-	.nav-link.active {
-		color: #c9a876;
-		text-shadow: 0 0 3px rgba(201, 168, 118, 0.3);
-	}
-
-	/* Ensure icon colors update instantly */
-	.nav-link :global(svg) {
-		transition: color 0.1s ease !important;
-	}
-
-	.nav-link.active :global(svg) {
-		transition: none !important;
-	}
-
-	.nav-link-mobile {
-		color: #d0d0d0;
-		transition:
-			color 0.15s ease,
-			background-color 0.3s ease,
-			border-color 0.3s ease,
-			box-shadow 0.3s ease;
-		font-family: 'Lora', serif;
-		text-align: center;
-		padding: 0.5rem 0.25rem;
-		border-radius: 0.25rem;
-	}
-
-	.nav-link-mobile:hover {
-		color: #c9a876;
-	}
-
-	/* Ensure mobile icon colors update instantly */
-	.nav-link-mobile :global(svg) {
-		transition: color 0.1s ease !important;
-	}
-
-	.nav-link-mobile.active :global(svg) {
-		transition: none !important;
-	}
-</style>

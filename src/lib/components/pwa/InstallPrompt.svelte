@@ -142,73 +142,50 @@
 		aria-labelledby="install-prompt-title"
 		aria-describedby="install-prompt-description"
 	>
-		<div
-			class="azaria-card rounded-lg border-2 p-4 shadow-lg"
-			style="
-				background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
-				border-color: #c9a876;
-				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 16px rgba(201, 168, 118, 0.3);
-			"
-		>
-			<!-- Close button -->
-			<button
-				class="text-azaria-text/60 hover:text-azaria-text absolute top-2 right-2"
-				on:click={dismissPrompt}
-				aria-label="Закрыть"
-			>
-				<Icon icon="mdi:close" class="h-5 w-5" />
-			</button>
-
-			<!-- Content -->
-			<div class="flex items-start gap-3">
-				<!-- Icon -->
-				<div
-					class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg"
-					style="background: rgba(201, 168, 118, 0.1); border: 1px solid rgba(201, 168, 118, 0.3);"
+		<div class="frame">
+			<div class="relative z-10 p-4">
+				<!-- Close button -->
+				<button
+					class="icon-btn absolute top-2 right-2"
+					on:click={dismissPrompt}
+					aria-label="Закрыть"
 				>
-					<Icon icon={getUIIcon('home')} class="h-6 w-6" style="color: #c9a876;" />
-				</div>
+					<Icon icon="mdi:close" class="h-5 w-5" />
+				</button>
 
-				<!-- Text content -->
-				<div class="flex-1">
-					<h3
-						id="install-prompt-title"
-						class="font-heading mb-1 text-lg font-semibold"
-						style="color: #c9a876;"
+				<!-- Content -->
+				<div class="flex items-start gap-3">
+					<!-- Icon -->
+					<div
+						class="grid size-12 shrink-0 place-items-center border border-line-strong bg-ink-700/50"
 					>
-						Установить Азария Вики
-					</h3>
-					<p
-						id="install-prompt-description"
-						class="mb-3 text-sm"
-						style="color: rgba(243, 233, 210, 0.8);"
-					>
-						{#if isIOS}
-							Нажмите <Icon icon="mdi:export-variant" class="mx-1 inline h-4 w-4" /> в Safari, затем "На
-							экран «Домой»"
-						{:else}
-							Установите приложение для быстрого доступа и работы в автономном режиме
-						{/if}
-					</p>
+						<Icon icon={getUIIcon('home')} class="h-6 w-6 text-brass" />
+					</div>
 
-					<!-- Action buttons -->
-					<div class="flex gap-2">
-						{#if !isIOS}
-							<button
-								class="azaria-btn flex-1 text-sm"
-								on:click={handleInstall}
-								style="padding: 0.5rem 1rem;"
-							>
-								<Icon icon="mdi:download" class="mr-1 inline h-4 w-4" />
-								Установить
-							</button>
-						{/if}
-						<button
-							class="border-azaria-text/30 text-azaria-text/80 hover:bg-azaria-text/10 flex-1 rounded border bg-transparent px-3 py-2 text-sm transition-colors"
-							on:click={dismissPrompt}
-						>
-							Позже
-						</button>
+					<!-- Text content -->
+					<div class="flex-1">
+						<h3 id="install-prompt-title" class="mb-1 font-display text-lg text-parchment">
+							Установить Азария Вики
+						</h3>
+						<p id="install-prompt-description" class="mb-3 text-sm text-parchment-dim">
+							{#if isIOS}
+								Нажмите <Icon icon="mdi:export-variant" class="mx-1 inline h-4 w-4" /> в Safari, затем
+								"На экран «Домой»"
+							{:else}
+								Установите приложение для быстрого доступа и работы в автономном режиме
+							{/if}
+						</p>
+
+						<!-- Action buttons -->
+						<div class="flex gap-2">
+							{#if !isIOS}
+								<button class="btn flex-1" on:click={handleInstall}>
+									<Icon icon="mdi:download" class="mr-1 inline h-4 w-4" />
+									Установить
+								</button>
+							{/if}
+							<button class="btn btn--quiet flex-1" on:click={dismissPrompt}> Позже </button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -219,10 +196,3 @@
 <!-- iOS Install Instructions - Only small notification, no full screen modal -->
 
 <!-- Full screen iOS modal removed -->
-
-<style>
-	.azaria-card {
-		background: linear-gradient(145deg, #242424 0%, #2a2a2a 100%);
-		border: 1px solid rgba(201, 168, 118, 0.3);
-	}
-</style>

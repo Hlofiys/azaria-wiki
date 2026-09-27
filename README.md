@@ -7,7 +7,18 @@
 
 ## Стек
 
-SvelteKit 2 (`@sveltejs/adapter-static`, полный пререндер) · Svelte 5 · Tailwind 4 + daisyUI · PWA (`@vite-pwa/sveltekit`) · marked / mdsvex / yaml · Docker (multi-stage) → nginx · GitHub Actions → ghcr.io.
+SvelteKit 2 (`@sveltejs/adapter-static`, полный пререндер) · Svelte 5 · Tailwind 4 · PWA (`@vite-pwa/sveltekit`) · marked / mdsvex / yaml · Docker (multi-stage) → nginx · GitHub Actions → ghcr.io.
+
+## Дизайн-система «Гроссбух»
+
+Визуальный язык: средневековая хроника, свёрстанная как бухгалтерская книга — тёплый сливовый фон, латунные волосяные линии, засечки-уголки, сургучные печати. Одно место правды — токены в `src/app.css` (`@theme`), в компонентах нет ни одного hex.
+
+- **Палитра:** `ink-900…600` (фон/панели), `line`/`line-strong` (волосяные линии), `parchment`/`-dim`/`-mute` (текст), `brass`/`-bright`/`-deep` (идентичность), `seal-*` (по одной на раздел), `ok`/`danger`.
+- **Цвет раздела:** ставится атрибутом `data-seal={category}` на поддерево; CSS выводит `--seal`, `--seal-tint`, `--seal-line`. Утилиты: `.seal-text`, `.seal-border`, `.seal-bg`.
+- **Шрифты:** Prata (заголовки), Lora (текст), IBM Plex Mono (надписи, цифры, фолио) — самохостятся в `static/fonts` с кириллическими сабсетами. Cinzel Decorative убран: в нём нет кириллицы.
+- **Материалы:** `.frame` (гравированная рамка с уголками), `.surface`, `.stamp` (печать), `.chip`, `.leader`/`.leader__dots` (строки с отточием), `.plate` (клеймо записи), `.chronicle` (типографика статей, буквица).
+- **Иконки:** собираются в офлайн-коллекцию через `npm run icons:generate` (`scripts/generate-icons.mjs` → `src/lib/icons/collection.ts`), в рантайме ничего не запрашивается.
+- **Префикс фолио:** каждая запись получает номер вида `АРТ-4857` (`entryFolio` в `src/lib/utils/categories.ts`).
 
 ## Структура
 
@@ -15,7 +26,12 @@ SvelteKit 2 (`@sveltejs/adapter-static`, полный пререндер) · Sve
 src/lib/lore-content/<категория>/<slug>.md   статьи (6 категорий)
 src/lib/entity-map.json                      карта «название → статья» для [[ссылок]] (генерируется!)
 src/routes/                                  страницы: главная, категории, статьи, поиск
-src/lib/server/lore-parser.ts                парсер статей и вики-ссылок
+src/lib/components/ui/                       примитивы: frame, chip, stamp, dossier, slot-machine, lore-card…
+src/lib/utils/categories.ts                  словарь разделов (названия, описания, иконки, фолио)
+src/lib/server/lore-parser.ts                парсер статей, вики-ссылок, оглавления и обратных ссылок
+src/app.css                                  дизайн-токены, база, материалы, типографика статей
+scripts/fetch-fonts.mjs                      загрузка/нарезка шрифтов в static/fonts
+scripts/generate-icons.mjs                   сборка офлайн-коллекции иконок
 scripts/smoke-test.sh                        smoke-тесты собранного образа
 scripts/generate-entity-map.mjs              генератор entity-map из статей
 nginx.conf, security-headers.conf            конфиг раздачи и заголовки безопасности
@@ -31,6 +47,8 @@ npm run preview         # локальный предпросмотр сборк
 npm run check           # svelte-check (типы, a11y)
 npm run lint            # prettier + eslint
 npm run map:generate    # перегенерировать entity-map.json из статей
+npm run icons:generate  # пересобрать офлайн-коллекцию иконок (после добавления новых иконок)
+npm run fonts:fetch     # перекачать шрифты из Google Fonts в static/fonts
 
 make smoke              # smoke-тесты образа (нужен собранный image)
 make build / make run   # собрать/запустить образ (host 8080 → контейнер 80)
@@ -39,9 +57,11 @@ docker compose up -d    # запуск по docker-compose
 
 ## Статьи
 
-- Frontmatter: `title`, `tags`; инфобокс умеет `faction`, `type`, `status`, `age`, `population`, `image`, `ruler`, `era` и др.
+- Frontmatter: `title`, `tags`; досье умеет `type`, `status`, `faction`, `owner`, `ruler`, `realm`, `creator`, `era`, `age`, `population`, `length`, `effect`, `feature`, `members`, `philosophy`, `specialization`, `access`, `nickname`, `description`, `image`.
 - Вики-ссылки: `[[Название статьи]]` — резолвятся через `entity-map.json`. После добавления/переименования статей запускайте `npm run map:generate`.
+- Заголовки `##`/`###` автоматически получают якоря (транслит в id) и попадают в оглавление статьи.
 - Категории: `characters`, `locations`, `factions`, `artifacts`, `concepts`, `creatures`.
+- В карточках и фильтрах раздела используются `tags`; в разделе есть вид «Гроссбух» (таблица) и фильтры `?q=`, `?tag=`, `?sort=`, `?view=ledger`.
 
 ## Деплой
 

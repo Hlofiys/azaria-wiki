@@ -93,18 +93,18 @@
 		</div>
 
 		<div class="controls-toolbar">
-			<button onclick={zoomOut} aria-label="Zoom out" disabled={scale <= 1}>
+			<button onclick={zoomOut} aria-label="Уменьшить" disabled={scale <= 1}>
 				<Icon icon={getUIIcon('zoom-out')} />
 			</button>
-			<button onclick={reset} aria-label="Reset zoom">
+			<button onclick={reset} aria-label="Сбросить масштаб">
 				<Icon icon={getUIIcon('zoom-reset')} />
 			</button>
-			<button onclick={zoomIn} aria-label="Zoom in">
+			<button onclick={zoomIn} aria-label="Увеличить">
 				<Icon icon={getUIIcon('zoom-in')} />
 			</button>
 		</div>
 
-		<button class="close-button" onclick={close} aria-label="Close image viewer">
+		<button class="close-button" onclick={close} aria-label="Закрыть просмотр">
 			<Icon icon={getUIIcon('close')} />
 		</button>
 	</div>
@@ -113,91 +113,90 @@
 <style>
 	.viewer-overlay {
 		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		z-index: 5000; /* Extremely high z-index */
+		inset: 0;
+		z-index: 100;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: rgba(26, 26, 26, 0.7);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		animation: fadeIn 0.3s ease;
-		overflow: hidden; /* Prevents scrollbars on the overlay itself */
+		background-color: rgb(23 18 27 / 0.88);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		animation: fadeIn 0.25s ease;
+		overflow: hidden;
 	}
 
 	.viewer-content {
+		display: flex;
 		width: 100%;
 		height: 100%;
-		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	img {
 		max-width: 90vw;
-		max-height: 90vh;
+		max-height: 88vh;
 		object-fit: contain;
-		border-radius: 8px;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-		transition: transform 0.2s ease-out; /* Smooths out button zooms */
+		border: 1px solid var(--color-line-strong);
+		border-radius: 3px;
+		box-shadow: var(--shadow-lift);
+		transition: transform 0.2s ease-out;
 		will-change: transform;
 	}
 
 	.close-button,
 	.controls-toolbar button {
-		background: rgba(0, 0, 0, 0.6);
-		color: white;
-		border: 1px solid rgba(255, 255, 255, 0.2);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: var(--color-parchment-dim);
+		background: rgb(32 24 38 / 0.85);
+		border: 1px solid var(--color-line-strong);
+		border-radius: 3px;
 		cursor: pointer;
 		transition:
-			transform 0.2s ease,
-			background-color 0.2s ease;
+			color 0.18s ease,
+			background-color 0.18s ease,
+			border-color 0.18s ease;
 	}
+
 	.controls-toolbar button:hover,
 	.close-button:hover {
-		background: rgba(0, 0, 0, 0.8);
-		transform: scale(1.1);
+		color: var(--color-brass-bright);
+		border-color: var(--color-brass);
+		background: rgb(42 33 48 / 0.95);
 	}
+
 	.controls-toolbar button:disabled {
-		opacity: 0.5;
+		opacity: 0.4;
 		cursor: not-allowed;
-		transform: none;
 	}
 
 	.close-button {
 		position: absolute;
 		top: 1rem;
 		right: 1rem;
-		border-radius: 50%;
 		width: 2.5rem;
 		height: 2.5rem;
-		font-size: 1.5rem;
 	}
 
 	.controls-toolbar {
 		position: absolute;
-		bottom: 1rem;
+		bottom: 1.25rem;
 		left: 50%;
 		transform: translateX(-50%);
 		display: flex;
 		gap: 0.5rem;
-		background: rgba(0, 0, 0, 0.6);
 		padding: 0.5rem;
-		border-radius: 99px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: rgb(32 24 38 / 0.85);
+		border: 1px solid var(--color-line);
+		border-radius: 3px;
+		box-shadow: var(--shadow-panel);
 	}
 
 	.controls-toolbar button {
-		width: 3rem;
-		height: 3rem;
-		font-size: 1.5rem;
-		border-radius: 50%;
+		width: 2.75rem;
+		height: 2.75rem;
 	}
 
 	@keyframes fadeIn {

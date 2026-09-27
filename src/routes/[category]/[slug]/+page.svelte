@@ -1,250 +1,235 @@
 <script lang="ts">
-	import Infobox from '$lib/components/ui/Infobox.svelte';
+	import Dossier from '$lib/components/ui/Dossier.svelte';
 	import LoreCard from '$lib/components/ui/LoreCard.svelte';
-	import { Icon, getUIIcon } from '$lib/icons';
+	import Stamp from '$lib/components/ui/Stamp.svelte';
+	import Tag from '$lib/components/ui/Tag.svelte';
+	import SectionHeading from '$lib/components/ui/SectionHeading.svelte';
+	import { Icon, getCategoryIcon, getUIIcon } from '$lib/icons';
+	import {
+		entryFolio,
+		getCategoryName,
+		getCategorySectionLabel,
+		type CategoryType
+	} from '$lib/utils/categories';
 	import { resolve } from '$app/paths';
-	import { getCategoryName } from '$lib/utils/categories';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
+
+	const category = $derived(data.entry.metadata.category as CategoryType);
+	const folio = $derived(entryFolio(category, data.entry.metadata.slug));
+	const status = $derived(
+		typeof data.entry.metadata.status === 'string' ? data.entry.metadata.status : ''
+	);
+	const isShortStatus = $derived(status.length > 0 && status.length <= 26 && !status.includes('—'));
+
+	const index = $derived(data.siblings.findIndex((item) => item.slug === data.entry.metadata.slug));
+	const previous = $derived(index > 0 ? data.siblings[index - 1] : null);
+	const next = $derived(
+		index >= 0 && index < data.siblings.length - 1 ? data.siblings[index + 1] : null
+	);
+
+	const updated = $derived(
+		data.entry.metadata.updated
+			? new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(
+					new Date(data.entry.metadata.updated)
+				)
+			: ''
+	);
+
+	let activeId = $state('');
+	let tocOpen = $state(false);
+
+	onMount(() => {
+		tocOpen = window.matchMedia('(min-width: 1024px)').matches;
+	});
+
+	// Highlight the section currently in view.
+	$effect(() => {
+		const headings = document.querySelectorAll<HTMLElement>('.chronicle h2[id], .chronicle h3[id]');
+		if (headings.length === 0) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const visible = entries
+					.filter((entry) => entry.isIntersecting)
+					.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+				if (visible[0]?.target.id) activeId = visible[0].target.id;
+			},
+			{ rootMargin: '-96px 0px -70% 0px', threshold: [0, 1] }
+		);
+
+		headings.forEach((heading) => observer.observe(heading));
+		return () => observer.disconnect();
+	});
 </script>
 
 <svelte:head>
 	<title>{data.entry.metadata.title} — Азария Вики</title>
-	<meta name="description" content="Информация о {data.entry.metadata.title} в мире Азарии" />
+	<meta
+		name="description"
+		content={data.entry.metadata.description ??
+			`${data.entry.metadata.title} — запись в гроссбухе мира Азарии.`}
+	/>
 </svelte:head>
 
-<div class="mx-auto max-w-7xl px-2 sm:px-4">
-	<div class="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-3 lg:gap-8">
-		<!-- Main Content -->
-		<div class="order-2 lg:col-span-2">
-			<div class="azaria-card">
-				<div class="p-4 md:p-6 lg:p-8">
-					<!-- Breadcrumbs -->
-					<div class="breadcrumbs">
-						<nav class="breadcrumb-nav">
-							<a href={resolve('/')} class="breadcrumb-link">Главная</a> /
-							<a
-								href={resolve(`/${data.entry.metadata.category}` as `/${string}`)}
-								class="breadcrumb-link"
-							>
-								{getCategoryName(data.entry.metadata.category)}
-							</a>
-							/
-							<span class="breadcrumb-current">{data.entry.metadata.title}</span>
-						</nav>
-					</div>
+<div class="seal" data-seal={category}>
+	<!-- Breadcrumbs -->
+	<nav class="eyebrow flex flex-wrap items-center gap-2" aria-label="Навигационная цепочка">
+		<a href={resolve('/')} class="hover:text-brass-bright">Главная</a>
+		<span aria-hidden="true">/</span>
+		<a href={resolve(`/${category}` as `/${string}`)} class="hover:text-brass-bright"
+			>{getCategoryName(category)}</a
+		>
+		<span aria-hidden="true">/</span>
+		<span class="text-brass-deep">{data.entry.metadata.title}</span>
+	</nav>
 
-					<!-- Main Title -->
-					<h1 class="main-title sm:text-xl md:mb-6 md:text-2xl lg:text-3xl">
-						{data.entry.metadata.title}
-					</h1>
-
-					<!-- Content -->
-					<!-- eslint-disable svelte/no-at-html-tags -->
-					<div class="content-wrapper">
-						<div class="markdown-content">
-							{@html data.entry.content}
-						</div>
-					</div>
-					<!-- eslint-enable svelte/no-at-html-tags -->
-
-					<!-- Navigation -->
-					<div
-						class="border-azaria-gold/30 mt-6 flex flex-col items-start justify-between gap-3 border-t pt-4 sm:flex-row sm:items-center md:mt-8 md:pt-6"
-					>
-						<a
-							href={resolve(`/${data.entry.metadata.category}` as `/${string}`)}
-							class="azaria-btn inline-block text-sm md:text-base"
-						>
-							← Назад к {getCategoryName(data.entry.metadata.category, 'plural')
-								.toLowerCase()
-								.replace(/и$/, 'ам')
-								.replace(/а$/, 'е')}
-						</a>
-
-						<button
-							on:click={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-							class="azaria-btn inline-block text-sm md:text-base"
-						>
-							↑ Наверх
-						</button>
-					</div>
-				</div>
-			</div>
+	<!-- Title block -->
+	<header class="mt-6 border-b border-line pb-7">
+		<div class="flex flex-wrap items-center gap-3">
+			<span class="chip chip--brass">
+				<Icon icon={getCategoryIcon(category)} width="12" class="seal-text" />
+				{getCategoryName(category)}
+			</span>
+			<span class="folio">запись {folio}</span>
+			{#if isShortStatus}
+				<Stamp label={status} />
+			{/if}
 		</div>
 
-		<!-- Sidebar with Infobox -->
-		<div class="order-1 lg:order-2">
-			<Infobox entry={data.entry.metadata} backlinks={data.backlinks} />
+		<h1 class="mt-4 font-display text-3xl leading-tight sm:text-4xl lg:text-5xl">
+			{data.entry.metadata.title}
+		</h1>
+
+		<div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+			{#if data.entry.metadata.tags?.length}
+				<div class="flex flex-wrap gap-1.5">
+					{#each data.entry.metadata.tags as tag (tag)}
+						<Tag label={tag} />
+					{/each}
+				</div>
+			{/if}
+			{#if updated}
+				<span class="folio">обновлено {updated}</span>
+			{/if}
+			{#if data.citations > 0}
+				<span class="folio">ссылаются {data.citations} раз</span>
+			{/if}
+		</div>
+	</header>
+
+	<div class="mt-8 grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
+		<!-- Table of contents -->
+		{#if data.entry.toc.length > 2}
+			<aside class="lg:sticky lg:top-24 lg:self-start">
+				<details class="group" bind:open={tocOpen}>
+					<summary
+						class="eyebrow flex cursor-pointer list-none items-center justify-between border-b border-line pb-2"
+					>
+						Содержание
+						<Icon
+							icon="mdi:chevron-down"
+							width="14"
+							class="transition-transform group-open:rotate-180"
+						/>
+					</summary>
+					<nav class="mt-3 flex flex-col" aria-label="Содержание записи">
+						{#each data.entry.toc as item, position (item.id)}
+							<a
+								href="#{item.id}"
+								class="toc__link"
+								class:toc__link--active={activeId === item.id}
+								class:toc__link--sub={item.level === 3}
+							>
+								<span class="toc__num">{String(position + 1).padStart(2, '0')}</span>
+								<span>{item.text}</span>
+							</a>
+						{/each}
+					</nav>
+				</details>
+			</aside>
+		{:else}
+			<aside class="hidden lg:block"></aside>
+		{/if}
+
+		<div class="grid gap-10 xl:grid-cols-[minmax(0,1fr)_19rem]">
+			<!-- Article -->
+			<article class="chronicle order-2 xl:order-1">
+				<!-- eslint-disable svelte/no-at-html-tags -->
+				{@html data.entry.content}
+				<!-- eslint-enable svelte/no-at-html-tags -->
+
+				<!-- Prev / next in this section -->
+				<nav
+					class="mt-12 grid gap-3 border-t border-line pt-6 sm:grid-cols-2"
+					aria-label="Соседние записи"
+				>
+					{#if previous}
+						<a
+							href={resolve(`/${category}/${previous.slug}` as `/${string}/${string}`)}
+							class="group"
+						>
+							<span class="eyebrow flex items-center gap-1.5">
+								<Icon icon="mdi:arrow-left" width="12" />
+								Предыдущая
+							</span>
+							<span class="mt-1 block font-display text-lg group-hover:text-brass-bright"
+								>{previous.title}</span
+							>
+						</a>
+					{:else}
+						<span></span>
+					{/if}
+					{#if next}
+						<a
+							href={resolve(`/${category}/${next.slug}` as `/${string}/${string}`)}
+							class="group sm:text-right"
+						>
+							<span class="eyebrow flex items-center gap-1.5 sm:justify-end">
+								Следующая
+								<Icon icon={getUIIcon('arrow-right')} width="12" />
+							</span>
+							<span class="mt-1 block font-display text-lg group-hover:text-brass-bright"
+								>{next.title}</span
+							>
+						</a>
+					{/if}
+				</nav>
+			</article>
+
+			<!-- Dossier -->
+			<div class="order-1 xl:order-2">
+				<Dossier entry={data.entry.metadata} backlinks={data.backlinks} />
+			</div>
 		</div>
 	</div>
 
-	<!-- Related Entries (if backlinks exist) -->
-	{#if data.backlinks && data.backlinks.length > 0}
-		<div class="mt-8 md:mt-12">
-			<h2 class="font-heading text-azaria-gold mb-4 text-xl md:mb-6 md:text-2xl">
-				<div class="flex flex-col items-center justify-center gap-2 sm:flex-row">
-					<Icon icon={getUIIcon('book')} />
-					<span>Связанные статьи</span>
-				</div>
-			</h2>
-			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+	<!-- Return -->
+	<div class="mt-10 flex flex-wrap gap-3">
+		<a href={resolve(`/${category}` as `/${string}`)} class="btn btn--sm">
+			<Icon icon="mdi:arrow-left" width="13" />
+			{getCategorySectionLabel(category)}
+		</a>
+		<button
+			type="button"
+			class="btn btn--quiet btn--sm"
+			onclick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+		>
+			<Icon icon={getUIIcon('arrow-up')} width="13" />
+			Наверх
+		</button>
+	</div>
+
+	{#if data.backlinks.length > 0}
+		<section class="mt-14">
+			<SectionHeading eyebrow="Обратные ссылки" title="Связанные записи" />
+			<div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{#each data.backlinks.slice(0, 6) as backlink (backlink.slug)}
-					<LoreCard entry={backlink} showCategory={true} />
+					<LoreCard entry={backlink} showCategory />
 				{/each}
 			</div>
-
-			{#if data.backlinks.length > 6}
-				<div class="mt-4 text-center md:mt-6">
-					<p class="text-azaria-text/70 font-body text-sm md:text-base">
-						И еще {data.backlinks.length - 6} связанных статей...
-					</p>
-				</div>
-			{/if}
-		</div>
+		</section>
 	{/if}
 </div>
-
-<style>
-	.markdown-content :global(h1),
-	.markdown-content :global(h2),
-	.markdown-content :global(h3),
-	.markdown-content :global(h4) {
-		font-family: 'Cinzel Decorative', serif;
-		color: #c9a876;
-		text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
-		margin-bottom: 1rem;
-		margin-top: 1.5rem;
-	}
-	.markdown-content :global(h1) {
-		font-size: 1.875rem;
-	}
-	.markdown-content :global(h2) {
-		font-size: 1.5rem;
-	}
-	.markdown-content :global(h3) {
-		font-size: 1.25rem;
-	}
-	.markdown-content :global(h4) {
-		font-size: 1.125rem;
-	}
-
-	.markdown-content :global(p) {
-		margin-bottom: 1rem;
-		color: #d0d0d0;
-		font-family: 'Lora', serif;
-		line-height: 1.7;
-	}
-
-	.markdown-content :global(ul),
-	.markdown-content :global(ol) {
-		list-style-position: inside;
-		margin-bottom: 1rem;
-		color: #d0d0d0;
-		padding-left: 1rem;
-	}
-	.markdown-content :global(ul) {
-		list-style-type: disc;
-	}
-	.markdown-content :global(ol) {
-		list-style-type: decimal;
-	}
-
-	.markdown-content :global(li) {
-		margin-bottom: 0.25rem;
-	}
-
-	.markdown-content :global(strong) {
-		color: #c9a876;
-		font-weight: 600;
-	}
-
-	.markdown-content :global(em) {
-		color: #f4d03f;
-		font-style: italic;
-	}
-
-	.markdown-content :global(blockquote) {
-		border-left: 4px solid #c9a876;
-		padding-left: 1rem;
-		margin: 1rem 0;
-		font-style: italic;
-		color: #f4d03f;
-	}
-
-	/* Your existing wiki-link styles are already good */
-	:global(.wiki-link) {
-		color: #c9a876;
-		text-decoration: underline;
-		transition: color 0.3s ease;
-		position: relative;
-	}
-	:global(.wiki-link:hover::after) {
-		content: attr(title);
-		position: absolute;
-		bottom: 100%;
-		left: 50%;
-		transform: translateX(-50%);
-		background: rgba(42, 13, 46, 0.95);
-		color: #f3e9d2;
-		padding: 0.5rem;
-		border-radius: 0.25rem;
-		border: 1px solid #ffd700;
-		font-size: 0.75rem;
-		white-space: nowrap;
-		z-index: 10;
-		pointer-events: none;
-	}
-	:global(.wiki-link-missing) {
-		color: #8b2635;
-		cursor: help;
-		border-bottom: 1px dotted #8b2635;
-	}
-	:global(.wiki-link-missing:hover::after) {
-		content: attr(title);
-		position: absolute;
-		bottom: 100%;
-		left: 50%;
-		transform: translateX(-50%);
-		background: rgba(200, 30, 30, 0.95);
-		color: #f3e9d2;
-		padding: 0.5rem;
-		border-radius: 0.25rem;
-		border: 1px solid #c81e1e;
-		font-size: 0.75rem;
-		white-space: nowrap;
-		z-index: 10;
-		pointer-events: none;
-	}
-
-	.breadcrumbs {
-		font-size: 0.75rem;
-		margin-bottom: 0.75rem;
-	}
-
-	.breadcrumb-nav {
-		color: rgba(226, 213, 199, 0.7);
-	}
-
-	.breadcrumb-link {
-		color: #c9a876;
-		text-decoration: none;
-	}
-
-	.breadcrumb-current {
-		color: #c9a876;
-	}
-
-	.main-title {
-		font-size: 1.5rem;
-		font-family: 'Cinzel Decorative', serif;
-		color: #c9a876;
-		margin-bottom: 1rem;
-		text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
-	}
-
-	.content-wrapper {
-		max-width: none;
-	}
-</style>

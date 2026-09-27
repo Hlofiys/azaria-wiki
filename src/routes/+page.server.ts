@@ -1,42 +1,57 @@
-import { getAllEntriesFlat } from '$lib/server/lore-parser';
+import { getAllEntries, getAllEntriesFlat, getLinkCounts } from '$lib/server/lore-parser';
 import type { EntryListItem } from '$lib/server/lore-parser';
+import { CATEGORY_ORDER } from '$lib/utils/categories';
+import type { CategoryType } from '$lib/utils/categories';
 import type { PageServerLoad } from './$types';
 
 export interface PageData {
 	featuredEntries: EntryListItem[];
 	slotMachineEntries: EntryListItem[];
+	recentEntries: EntryListItem[];
+	topCited: Array<EntryListItem & { citations: number }>;
+	categoryCounts: Record<CategoryType, number>;
 	totalEntries: number;
 }
+
+const byMostRecent = (a: EntryListItem, b: EntryListItem) =>
+	new Date(b.updated ?? 0).getTime() - new Date(a.updated ?? 0).getTime();
 
 export const load: PageServerLoad<PageData> = async () => {
 	try {
 		const allEntries = getAllEntriesFlat();
+		const linkCounts = getLinkCounts();
 
-		// Get featured entries (first few from each category)
-		const featuredEntries: EntryListItem[] = [];
-		const categories = [
-			'characters',
-			'locations',
-			'factions',
-			'artifacts',
-			'concepts',
-			'creatures'
-		] as const;
+		const categoryCounts = CATEGORY_ORDER.reduce(
+			(acc, category) => {
+				acc[category] = getAllEntries(category).length;
+				return acc;
+			},
+			{} as Record<CategoryType, number>
+		);
 
-		categories.forEach((category) => {
-			const categoryEntries = allEntries.filter((entry) => entry.category === category);
-			if (categoryEntries.length > 0) {
-				featuredEntries.push(categoryEntries[0]); // Add first entry from each category
-			}
-		});
+		// One entry per category, as a representative cross-section.
+		const featuredEntries = CATEGORY_ORDER.map(
+			(category) => allEntries.find((entry) => entry.category === category) ?? null
+		).filter((entry): entry is EntryListItem => entry !== null);
 
-		// Get random entries for slot machine
+		// Most linked-to entries — the ledger's most cited records.
+		const topCited = [...allEntries]
+			.map((entry) => ({ ...entry, citations: linkCounts[entry.title.toLowerCase()] ?? 0 }))
+			.filter((entry) => entry.citations > 0)
+			.sort((a, b) => b.citations - a.citations || a.title.localeCompare(b.title, 'ru'))
+			.slice(0, 6);
+
+		const recentEntries = [...allEntries].sort(byMostRecent).slice(0, 6);
+
 		const shuffled = [...allEntries].sort(() => Math.random() - 0.5);
-		const slotMachineEntries = shuffled.slice(0, 12); // 12 entries for slot machine animation
+		const slotMachineEntries = shuffled.slice(0, 48);
 
 		return {
 			featuredEntries,
 			slotMachineEntries,
+			recentEntries,
+			topCited,
+			categoryCounts,
 			totalEntries: allEntries.length
 		};
 	} catch (error) {
@@ -44,6 +59,9 @@ export const load: PageServerLoad<PageData> = async () => {
 		return {
 			featuredEntries: [],
 			slotMachineEntries: [],
+			recentEntries: [],
+			topCited: [],
+			categoryCounts: {} as Record<CategoryType, number>,
 			totalEntries: 0
 		};
 	}

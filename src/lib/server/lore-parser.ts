@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'yaml';
-import { marked } from 'marked';
-import type { CategoryType } from '../icons.js';
+import { Marked } from 'marked';
+import type { CategoryType } from '../utils/categories.js';
+import { categoryDescriptions, categoryNames } from '../utils/categories.js';
 
 // Type definitions
 export interface EntryMetadata {
@@ -31,12 +32,20 @@ export interface EntryMetadata {
 	specialization?: string;
 	category: CategoryType;
 	slug: string;
+	updated?: string;
 	[key: string]: unknown;
+}
+
+export interface TocItem {
+	id: string;
+	text: string;
+	level: number;
 }
 
 export interface Entry {
 	metadata: EntryMetadata;
 	content: string;
+	toc: TocItem[];
 }
 
 export interface EntryListItem {
@@ -50,6 +59,7 @@ export interface EntryListItem {
 	location?: string;
 	faction?: string;
 	tags?: string[];
+	updated?: string;
 	[key: string]: unknown;
 }
 
@@ -70,6 +80,15 @@ export interface FrontmatterResult {
 }
 
 const LORE_CONTENT_DIR = path.join(process.cwd(), 'src/lib/lore-content');
+
+const CATEGORY_DIRS: CategoryType[] = [
+	'characters',
+	'locations',
+	'factions',
+	'artifacts',
+	'concepts',
+	'creatures'
+];
 
 // Enhanced caching system for server-side operations
 const serverCache = new Map<string, unknown>();
@@ -98,6 +117,161 @@ function isValidCache(key: string): boolean {
 	const timestamp = cacheTimestamps.get(key);
 	if (!timestamp) return false;
 	return Date.now() - timestamp < CACHE_TTL;
+}
+
+/* --------------------------------------------------------------------------
+   Heading anchors and table of contents
+   -------------------------------------------------------------------------- */
+
+const TRANSLIT: Record<string, string> = {
+	а: 'a',
+	б: 'b',
+	в: 'v',
+	г: 'g',
+	д: 'd',
+	е: 'e',
+	ё: 'e',
+	ж: 'zh',
+	з: 'z',
+	и: 'i',
+	й: 'y',
+	к: 'k',
+	л: 'l',
+	м: 'm',
+	н: 'n',
+	о: 'o',
+	п: 'p',
+	р: 'r',
+	с: 's',
+	т: 't',
+	у: 'u',
+	ф: 'f',
+	х: 'h',
+	ц: 'ts',
+	ч: 'ch',
+	ш: 'sh',
+	щ: 'shch',
+	ъ: '',
+	ы: 'y',
+	ь: '',
+	э: 'e',
+	ю: 'yu',
+	я: 'ya'
+};
+
+/** Stable, readable anchor ids for Russian headings: «ВНЕШНИЙ ВИД» → #vneshniy-vid */
+export function slugifyHeading(text: string): string {
+	return text
+		.toLowerCase()
+		.split('')
+		.map((char) => TRANSLIT[char] ?? char)
+		.join('')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '')
+		.slice(0, 64);
+}
+
+/** Pull h2/h3 headings out of raw markdown before it is converted to HTML. */
+function extractToc(markdown: string): TocItem[] {
+	const toc: TocItem[] = [];
+	const seen = new Map<string, number>();
+
+	for (const line of markdown.split('\n')) {
+		const match = /^(#{2,3})\s+(.+?)\s*$/.exec(line);
+		if (!match) continue;
+
+		const text = match[2].replace(/[*_`]/g, '').trim();
+		const base = slugifyHeading(text) || 'section';
+		const count = (seen.get(base) ?? 0) + 1;
+		seen.set(base, count);
+
+		toc.push({ id: count === 1 ? base : `${base}-${count}`, text, level: match[1].length });
+	}
+
+	return toc;
+}
+
+/** Add ids + anchor links to markdown headings, using the same slugs as the TOC. */
+function createMarked() {
+	const instance = new Marked();
+	const seen = new Map<string, number>();
+
+	const escapeHtml = (value: string) =>
+		value
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;');
+
+	instance.use({
+		renderer: {
+			heading(token) {
+				const plain = String(token.text).replace(/[*_`]/g, '').trim();
+				const base = slugifyHeading(plain) || 'section';
+				const count = (seen.get(base) ?? 0) + 1;
+				seen.set(base, count);
+				const id = count === 1 ? base : `${base}-${count}`;
+
+				return `<h${token.depth} id="${id}"><a class="anchor-link" href="#${id}">${escapeHtml(plain)}</a></h${token.depth}>`;
+			}
+		}
+	});
+
+	return instance;
+}
+
+/* --------------------------------------------------------------------------
+   Link index — which entries link to which titles (single pass over the files)
+   -------------------------------------------------------------------------- */
+
+interface LinkIndex {
+	counts: Record<string, number>;
+	sources: Record<string, string[]>;
+}
+
+const WIKI_LINK = /\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g;
+
+function buildLinkIndex(): LinkIndex {
+	const cacheKey = 'link-index';
+	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
+		return serverCache.get(cacheKey) as LinkIndex;
+	}
+
+	const sources = new Map<string, Set<string>>();
+
+	for (const category of CATEGORY_DIRS) {
+		const dir = path.join(LORE_CONTENT_DIR, category);
+		if (!fs.existsSync(dir)) continue;
+
+		for (const file of fs.readdirSync(dir).filter((name) => name.endsWith('.md'))) {
+			const body = fs.readFileSync(path.join(dir, file), 'utf-8');
+			const slug = path.basename(file, '.md');
+
+			for (const match of body.matchAll(WIKI_LINK)) {
+				const target = match[1].trim().toLowerCase();
+				if (!target) continue;
+				const set = sources.get(target) ?? new Set<string>();
+				set.add(`${category}/${slug}`);
+				sources.set(target, set);
+			}
+		}
+	}
+
+	const counts: Record<string, number> = {};
+	const flat: Record<string, string[]> = {};
+	for (const [target, set] of sources) {
+		counts[target] = set.size;
+		flat[target] = [...set];
+	}
+
+	const index: LinkIndex = { counts, sources: flat };
+	serverCache.set(cacheKey, index);
+	cacheTimestamps.set(cacheKey, Date.now());
+	return index;
+}
+
+export function getLinkCounts(): Record<string, number> {
+	return buildLinkIndex().counts;
 }
 
 // Clear expired cache entries
@@ -146,10 +320,11 @@ export function getAllEntries(category: CategoryType): EntryListItem[] {
 					title: metadata.title || 'Untitled',
 					...metadata,
 					slug: path.basename(file, '.md'),
-					category
+					category,
+					updated: fs.statSync(filePath).mtime.toISOString()
 				} as EntryListItem;
 			})
-			.sort((a, b) => (a.title || '').localeCompare(b.title || '')); // Sort for consistent ordering
+			.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'ru')); // Sort for consistent ordering
 
 		// Cache the result
 		serverCache.set(cacheKey, entries);
@@ -184,17 +359,20 @@ export async function getEntry(category: CategoryType, slug: string): Promise<En
 	// Process wiki links in content first
 	const processedBody = processWikiLinks(body);
 
-	// Convert markdown to HTML
-	const htmlContent = await marked(processedBody);
+	// Convert markdown to HTML (headings get ids + anchor links)
+	const md = createMarked();
+	const htmlContent = md.parse(processedBody, { async: false });
 
 	return {
 		metadata: {
 			title: frontmatter.title || 'Untitled',
 			...frontmatter,
 			category,
-			slug
+			slug,
+			updated: fs.statSync(filePath).mtime.toISOString()
 		} as EntryMetadata,
-		content: htmlContent
+		content: htmlContent,
+		toc: extractToc(body)
 	};
 }
 
@@ -213,17 +391,8 @@ export function getAllEntriesFlat(): EntryListItem[] {
 	// Clear expired cache periodically
 	clearExpiredCache();
 
-	const categories: CategoryType[] = [
-		'characters',
-		'locations',
-		'factions',
-		'artifacts',
-		'concepts',
-		'creatures'
-	];
-
 	try {
-		const allEntries = categories.flatMap((category) => getAllEntries(category));
+		const allEntries = CATEGORY_DIRS.flatMap((category) => getAllEntries(category));
 
 		// Cache the result
 		serverCache.set(cacheKey, allEntries);
@@ -271,24 +440,13 @@ export function getRandomEntry(): EntryListItem | undefined {
  * @returns Array of entries that link to this entry
  */
 export async function getBacklinks(category: CategoryType, slug: string): Promise<EntryListItem[]> {
-	const allEntries = getAllEntriesFlat();
-	const targetEntry = await getEntry(category, slug);
+	const entry = await getEntry(category, slug);
+	if (!entry) return [];
 
-	if (!targetEntry) return [];
+	const { sources } = buildLinkIndex();
+	const keys = new Set(sources[(entry.metadata.title ?? '').toLowerCase()] ?? []);
 
-	const backlinks: EntryListItem[] = [];
-	const title = targetEntry.metadata.title || '';
-	const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-	const linkRe = new RegExp(`\\[\\[\\s*${escaped}\\s*(\\|[^\\]]*)?\\]\\]`, 'i');
-
-	for (const entry of allEntries) {
-		const fullEntry = await getEntry(entry.category, entry.slug);
-		if (fullEntry && linkRe.test(fullEntry.content)) {
-			backlinks.push(entry);
-		}
-	}
-
-	return backlinks;
+	return getAllEntriesFlat().filter((item) => keys.has(`${item.category}/${item.slug}`));
 }
 
 /**
@@ -361,28 +519,22 @@ function processWikiLinks(content: string): string {
 export function getCategoryInfo(category: CategoryType): CategoryInfo {
 	const categoryInfo: Record<CategoryType, CategoryInfo> = {
 		characters: {
-			title: 'Персонажи',
-			description: 'Влиятельные личности мира Азарии'
+			title: categoryNames.characters.plural,
+			description: categoryDescriptions.characters
 		},
 		locations: {
-			title: 'Локации',
-			description: 'Города, крепости и загадочные места'
+			title: categoryNames.locations.plural,
+			description: categoryDescriptions.locations
 		},
-		factions: {
-			title: 'Фракции',
-			description: 'Государства, организации и союзы'
-		},
+		factions: { title: categoryNames.factions.plural, description: categoryDescriptions.factions },
 		artifacts: {
-			title: 'Артефакты',
-			description: 'Магические предметы и реликвии'
+			title: categoryNames.artifacts.plural,
+			description: categoryDescriptions.artifacts
 		},
-		concepts: {
-			title: 'Концепции',
-			description: 'Философии и принципы мира Азарии'
-		},
+		concepts: { title: categoryNames.concepts.plural, description: categoryDescriptions.concepts },
 		creatures: {
-			title: 'Существа',
-			description: 'Монстры, демоны и фантастические создания'
+			title: categoryNames.creatures.plural,
+			description: categoryDescriptions.creatures
 		}
 	};
 

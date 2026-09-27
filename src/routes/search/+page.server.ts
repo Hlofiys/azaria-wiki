@@ -1,18 +1,25 @@
 import { getAllEntriesFlat } from '$lib/server/lore-parser';
-import type { PageServerLoad } from './$types';
 import type { EntryListItem } from '$lib/server/lore-parser';
-
-export const prerender = true;
+import type { PageServerLoad } from './$types';
 
 export interface PageData {
-	allEntries: EntryListItem[]; // Pass all entries for client-side search
+	allEntries: EntryListItem[];
+	initialQuery: string;
+	initialResults: EntryListItem[];
 }
 
-export const load: PageServerLoad<PageData> = async () => {
+export const load: PageServerLoad<PageData> = async ({ url }) => {
 	const allEntries = getAllEntriesFlat();
+	const initialQuery = url.searchParams.get('q') ?? '';
+	const needle = initialQuery.trim().toLowerCase();
 
-	// For static builds, we'll do the search entirely on the client side
-	return {
-		allEntries
-	};
+	const initialResults = needle
+		? allEntries.filter((entry) =>
+				[entry.title, entry.type, entry.faction, entry.status, ...(entry.tags ?? [])]
+					.filter(Boolean)
+					.some((field) => String(field).toLowerCase().includes(needle))
+			)
+		: [];
+
+	return { allEntries, initialQuery, initialResults };
 };
