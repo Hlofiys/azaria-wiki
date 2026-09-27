@@ -34,7 +34,7 @@ if (browser) {
 
 		// Interaction to Next Paint (experimental)
 		const inpObserver = new PerformanceObserver((entryList) => {
-			const entries = entryList.getEntries();
+			const entries = entryList.getEntries() as PerformanceEventTiming[];
 			entries.forEach((entry) => {
 				if (entry.processingStart && entry.startTime) {
 					const inp = entry.processingStart - entry.startTime;
@@ -99,7 +99,7 @@ if (browser) {
 			const batchSize = 3;
 			for (let i = 0; i < commonIcons.length; i += batchSize) {
 				const batch = commonIcons.slice(i, i + batchSize);
-				window.Iconify.preloadIcons(batch);
+				window.Iconify.preloadIcons?.(batch);
 			}
 		}
 	};

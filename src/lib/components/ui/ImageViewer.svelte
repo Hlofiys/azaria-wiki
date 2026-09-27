@@ -66,44 +66,45 @@
 	});
 </script>
 
-<svelte:window
-	on:keydown={handleKeydown}
-	on:mouseup={handleMouseUp}
-	on:mousemove={handleMouseMove}
-/>
+<svelte:window onkeydown={handleKeydown} onmouseup={handleMouseUp} onmousemove={handleMouseMove} />
 
 {#if $imageViewer.isOpen && $imageViewer.src}
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		class="viewer-overlay"
-		on:click={close}
 		role="dialog"
 		aria-modal="true"
-		on:wheel={handleWheel}
+		tabindex="-1"
+		onclick={(event) => {
+			// Close only when clicking the backdrop itself, not the image or controls
+			if (event.target === event.currentTarget) close();
+		}}
+		onwheel={handleWheel}
 	>
-		<div class="viewer-content" on:click|stopPropagation>
+		<div class="viewer-content">
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<img
 				src={$imageViewer.src}
 				alt="Fullscreen view"
 				style:transform="translate({posX}px, {posY}px) scale({scale})"
 				style:cursor={scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'}
-				on:mousedown={handleMouseDown}
+				onmousedown={handleMouseDown}
 			/>
 		</div>
 
-		<div class="controls-toolbar" on:click|stopPropagation>
-			<button on:click={zoomOut} aria-label="Zoom out" disabled={scale <= 1}>
+		<div class="controls-toolbar">
+			<button onclick={zoomOut} aria-label="Zoom out" disabled={scale <= 1}>
 				<Icon icon={getUIIcon('zoom-out')} />
 			</button>
-			<button on:click={reset} aria-label="Reset zoom">
+			<button onclick={reset} aria-label="Reset zoom">
 				<Icon icon={getUIIcon('zoom-reset')} />
 			</button>
-			<button on:click={zoomIn} aria-label="Zoom in">
+			<button onclick={zoomIn} aria-label="Zoom in">
 				<Icon icon={getUIIcon('zoom-in')} />
 			</button>
 		</div>
 
-		<button class="close-button" on:click={close} aria-label="Close image viewer">
+		<button class="close-button" onclick={close} aria-label="Close image viewer">
 			<Icon icon={getUIIcon('close')} />
 		</button>
 	</div>

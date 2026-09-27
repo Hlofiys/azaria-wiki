@@ -1,40 +1,59 @@
-# sv
+# Азария — вики
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Статическая вики по миру «Азария» (медивал-деп-панк). Статьи — Markdown в репозитории, сборка — SvelteKit в статику, раздача — nginx в Docker.
 
-## Creating a project
+- **Прод:** https://azaria.hlofiys.xyz
+- **Канон мира:** `azaria_lore.md` (исходная «библия» лора)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Стек
 
-```sh
-# create a new project in the current directory
-npx sv create
+SvelteKit 2 (`@sveltejs/adapter-static`, полный пререндер) · Svelte 5 · Tailwind 4 + daisyUI · PWA (`@vite-pwa/sveltekit`) · marked / mdsvex / yaml · Docker (multi-stage) → nginx · GitHub Actions → ghcr.io.
 
-# create a new project in my-app
-npx sv create my-app
+## Структура
+
+```
+src/lib/lore-content/<категория>/<slug>.md   статьи (6 категорий)
+src/lib/entity-map.json                      карта «название → статья» для [[ссылок]] (генерируется!)
+src/routes/                                  страницы: главная, категории, статьи, поиск
+src/lib/server/lore-parser.ts                парсер статей и вики-ссылок
+scripts/smoke-test.sh                        smoke-тесты собранного образа
+scripts/generate-entity-map.mjs              генератор entity-map из статей
+nginx.conf, security-headers.conf            конфиг раздачи и заголовки безопасности
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Команды
 
 ```sh
-npm run dev
+npm ci                  # установка зависимостей
+npm run dev             # дев-сервер (http://localhost:5173)
+npm run build           # сборка статики в build/
+npm run preview         # локальный предпросмотр сборки
+npm run check           # svelte-check (типы, a11y)
+npm run lint            # prettier + eslint
+npm run map:generate    # перегенерировать entity-map.json из статей
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+make smoke              # smoke-тесты образа (нужен собранный image)
+make build / make run   # собрать/запустить образ (host 8080 → контейнер 80)
+docker compose up -d    # запуск по docker-compose
 ```
 
-## Building
+## Статьи
 
-To create a production version of your app:
+- Frontmatter: `title`, `tags`; инфобокс умеет `faction`, `type`, `status`, `age`, `population`, `image`, `ruler`, `era` и др.
+- Вики-ссылки: `[[Название статьи]]` — резолвятся через `entity-map.json`. После добавления/переименования статей запускайте `npm run map:generate`.
+- Категории: `characters`, `locations`, `factions`, `artifacts`, `concepts`, `creatures`.
 
-```sh
-npm run build
-```
+## Деплой
 
-You can preview the production build with `npm run preview`.
+GitHub Actions:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- `Checks` — svelte-check, lint и docker smoke-тесты;
+- `Build and Push Docker Image` — сборка multi-arch образа в `ghcr.io/hlofiys/azaria-wiki`.
 
-# azaria-wiki
+На сервере: `docker compose up -d` (образ подтянется из ghcr.io).
+
+## Заметки
+
+- **nginx:** `$uri.html` проверяется раньше `$uri/` — иначе прямые ссылки на статьи отдают 301→403 (каталоги `__data.json` из adapter-static). Не меняйте порядок; smoke-тесты это стерегут.
+- Заголовки безопасности продублированы в локациях через `include security-headers.conf` — правило наследования `add_header` в nginx: локация со своими `add_header` теряет унаследованные.
+- Админка `/admin` (Decap CMS) без авторизации нерабочая — статьи правятся через git.

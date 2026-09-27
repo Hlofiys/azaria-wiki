@@ -8,6 +8,13 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	interface Window {
+		/** Iconify runtime (loaded from CDN), used for icon preloading */
+		Iconify?: {
+			preloadIcons?: (icons: string[]) => void;
+		};
+	}
 }
 
 export {};

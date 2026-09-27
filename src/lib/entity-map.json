@@ -1,467 +1,437 @@
 {
-	"казич дэпич iii": {
-		"category": "characters",
-		"slug": "kazich-depich-iii",
-		"title": "Казич Дэпич III"
-	},
-	"ибн-лентяй мудрый": {
-		"category": "characters",
-		"slug": "ibn-lentyay-mudryy",
-		"title": "Ибн-Лентяй Мудрый"
-	},
-	"флинкс": {
-		"category": "characters",
-		"slug": "flinks",
-		"title": "Флинкс"
-	},
-	"коллектор": {
-		"category": "creatures",
-		"slug": "kollektor",
-		"title": "Коллектор"
-	},
-	"биомеханические моржи": {
-		"category": "creatures",
-		"slug": "biomehanicheskie-morzhi",
-		"title": "Биомеханические моржи"
-	},
-	"зеленоглазые": {
-		"category": "creatures",
-		"slug": "zelenoglazye",
-		"title": "Зеленоглазые"
-	},
-	"ломбардия": {
-		"category": "factions",
-		"slug": "lombardiya",
-		"title": "Ломбардия"
-	},
-	"людомразия": {
-		"category": "factions",
-		"slug": "lyudomraziya",
-		"title": "Людомразия"
-	},
-	"нормандия": {
-		"category": "factions",
-		"slug": "normandiya",
-		"title": "Нормандия"
-	},
-	"братство последнего депа": {
-		"category": "factions",
-		"slug": "bratstvo-poslednego-depa",
-		"title": "Братство Последнего Депа"
-	},
-	"орден золотого спина": {
-		"category": "factions",
-		"slug": "orden-zolotogo-spina",
-		"title": "Орден Золотого Спина"
-	},
-	"теневой совет": {
-		"category": "factions",
-		"slug": "tenevoy-sovet",
-		"title": "Теневой Совет"
-	},
-	"букмекер-таун": {
-		"category": "locations",
-		"slug": "bukmeker-taun",
-		"title": "Букмекер-Таун"
-	},
-	"косые слотики": {
-		"category": "locations",
-		"slug": "kosye-slotiki",
-		"title": "Косые Слотики"
-	},
-	"долговая яма": {
-		"category": "locations",
-		"slug": "dolgovaya-yama",
-		"title": "Долговая Яма"
-	},
-	"хребет волатильности": {
-		"category": "locations",
-		"slug": "hrebet-volatilnosti",
-		"title": "Хребет Волатильности"
-	},
-	"форт инкассация": {
-		"category": "locations",
-		"slug": "fort-inkassatsiya",
-		"title": "Форт Инкассация"
-	},
-	"golden занос": {
-		"category": "artifacts",
-		"slug": "golden-zanos",
-		"title": "Golden Занос"
-	},
-	"печать долга": {
-		"category": "artifacts",
-		"slug": "pechat-dolga",
-		"title": "Печать Долга"
-	},
-	"деп": {
-		"category": "concepts",
-		"slug": "dep",
-		"title": "Деп"
-	},
-	"спин": {
-		"category": "concepts",
-		"slug": "spin",
-		"title": "Спин"
-	},
-	"буна": {
-		"category": "concepts",
-		"slug": "buna",
-		"title": "Буна"
-	},
-	"занос": {
-		"category": "concepts",
-		"slug": "zanos",
-		"title": "Занос"
-	},
-	"недонос": {
-		"category": "concepts",
-		"slug": "nedonos",
-		"title": "Недонос"
-	},
-	"волатильность": {
-		"category": "concepts",
-		"slug": "volatilnost",
-		"title": "Волатильность"
-	},
-	"сир кейлан": {
-		"category": "characters",
-		"slug": "sir-keylan",
-		"title": "Сир Кейлан"
-	},
-	"лорд волатильный": {
-		"category": "characters",
-		"slug": "lord-volatilnyy",
-		"title": "Лорд Волатильный"
-	},
-	"мастер депа": {
-		"category": "characters",
-		"slug": "master-depa",
-		"title": "Мастер Депа"
-	},
-	"кардинал заноса": {
-		"category": "characters",
-		"slug": "kardinal-zanosa",
-		"title": "Кардинал Заноса"
-	},
 	"арена маджонга": {
 		"category": "locations",
 		"slug": "arena-madzhonga",
 		"title": "Арена Маджонга"
-	},
-	"стена баланса": {
-		"category": "locations",
-		"slug": "stena-balansa",
-		"title": "Стена Баланса"
-	},
-	"квартал ломбардов": {
-		"category": "locations",
-		"slug": "kvartal-lombardov",
-		"title": "Квартал Ломбардов"
-	},
-	"подвал недоносов": {
-		"category": "locations",
-		"slug": "podval-nedonosov",
-		"title": "Подвал Недоносов"
-	},
-	"княжеский зал": {
-		"category": "locations",
-		"slug": "knyazheskiy-zal",
-		"title": "Княжеский Зал"
-	},
-	"корона депа": {
-		"category": "artifacts",
-		"slug": "korona-depa",
-		"title": "Корона Депа"
-	},
-	"скипетр буны": {
-		"category": "artifacts",
-		"slug": "skipetr-buny",
-		"title": "Скипетр Буны"
-	},
-	"кольцо волатильности": {
-		"category": "artifacts",
-		"slug": "koltso-volatilnosti",
-		"title": "Кольцо Волатильности"
-	},
-	"амулет спина": {
-		"category": "artifacts",
-		"slug": "amulet-spina",
-		"title": "Амулет Спина"
-	},
-	"карты судьбы": {
-		"category": "artifacts",
-		"slug": "karty-sudby",
-		"title": "Карты Судьбы"
-	},
-	"коллекторство": {
-		"category": "concepts",
-		"slug": "kollektorstvo",
-		"title": "Коллекторство"
-	},
-	"депонентство": {
-		"category": "concepts",
-		"slug": "deponentstvo",
-		"title": "Депонентство"
-	},
-	"холодный расчёт": {
-		"category": "concepts",
-		"slug": "holodnyy-raschet",
-		"title": "Холодный расчёт"
-	},
-	"золотой спин": {
-		"category": "concepts",
-		"slug": "zolotoy-spin",
-		"title": "Золотой Спин"
-	},
-	"букмекерство": {
-		"category": "concepts",
-		"slug": "bukmekerstvo",
-		"title": "Букмекерство"
-	},
-	"щука трёх депов": {
-		"category": "creatures",
-		"slug": "schuka-treh-depov",
-		"title": "Щука трёх депов"
-	},
-	"демоны коллекторы": {
-		"category": "creatures",
-		"slug": "demony-kollektory",
-		"title": "Демоны Коллекторы"
-	},
-	"спин-драконы": {
-		"category": "creatures",
-		"slug": "spin-drakony",
-		"title": "Спин-Драконы"
-	},
-	"волки волатильности": {
-		"category": "creatures",
-		"slug": "volki-volatilnosti",
-		"title": "Волки Волатильности"
-	},
-	"гильдия букмекеров": {
-		"category": "factions",
-		"slug": "gildiya-bukmekerov",
-		"title": "Гильдия Букмекеров"
-	},
-	"каста крупье": {
-		"category": "factions",
-		"slug": "kasta-krupe",
-		"title": "Каста Крупье"
-	},
-	"орден математиков": {
-		"category": "factions",
-		"slug": "orden-matematikov",
-		"title": "Орден Математиков"
-	},
-	"союз инкассаторов": {
-		"category": "factions",
-		"slug": "soyuz-inkassatorov",
-		"title": "Союз Инкассаторов"
-	},
-	"донат-ханаты": {
-		"category": "factions",
-		"slug": "donat-hanaty",
-		"title": "Донат-Ханаты"
-	},
-	"людики": {
-		"category": "creatures",
-		"slug": "ludiki",
-		"title": "Людики"
-	},
-	"додепчёнки": {
-		"category": "creatures",
-		"slug": "dodepchyono",
-		"title": "Додепчёнки"
-	},
-	"слот-бороды": {
-		"category": "creatures",
-		"slug": "slot-borody",
-		"title": "Слот-Бороды"
-	},
-	"священные трутни": {
-		"category": "creatures",
-		"slug": "svyashchennyye-trutni",
-		"title": "Священные Трутни"
-	},
-	"дикий загребут": {
-		"category": "creatures",
-		"slug": "dikiy-zagrebut",
-		"title": "Дикий Загребут"
-	},
-	"maxline": {
-		"category": "creatures",
-		"slug": "maxline",
-		"title": "MaxLine"
-	},
-	"fonbet": {
-		"category": "creatures",
-		"slug": "fonbet",
-		"title": "FonBet"
-	},
-	"множители": {
-		"category": "creatures",
-		"slug": "mnozhiteli",
-		"title": "Множители"
-	},
-	"коллекторы": {
-		"category": "creatures",
-		"slug": "kollektory",
-		"title": "Коллекторы"
-	},
-	"гиены-коллекторы": {
-		"category": "creatures",
-		"slug": "gieny-kollektory",
-		"title": "Гиены-Коллекторы"
 	},
 	"аркадий белбетович": {
 		"category": "characters",
 		"slug": "arkadij-belbetovich",
 		"title": "Аркадий Белбетович"
 	},
-	"лади фортуния за нос": {
-		"category": "characters",
-		"slug": "ladi-fortuna-za-nos",
-		"title": "Леди Фортуния Занос"
+	"биомеханические моржи": {
+		"category": "creatures",
+		"slug": "biomekhanicheskiye-morzhi",
+		"title": "Биомеханические Моржи"
 	},
-	"тронный слот": {
-		"category": "artifacts",
-		"slug": "tronnyy-slot",
-		"title": "Тронный Слот"
+	"бонуска": {
+		"category": "concepts",
+		"slug": "bonuska",
+		"title": "Бонуска"
+	},
+	"братство последнего депа": {
+		"category": "factions",
+		"slug": "bratstvo-poslednego-depa",
+		"title": "Братство Последнего Депа"
+	},
+	"букмекер-таун": {
+		"category": "locations",
+		"slug": "bukmeker-taun",
+		"title": "Букмекер-Таун"
+	},
+	"буны": {
+		"category": "concepts",
+		"slug": "buny",
+		"title": "Буны"
+	},
+	"бычий занос": {
+		"category": "concepts",
+		"slug": "bychiy-zanos",
+		"title": "Бычий Занос"
+	},
+	"всё в ломбард!": {
+		"category": "concepts",
+		"slug": "vsyo-v-lombard",
+		"title": "Всё в ломбард!"
+	},
+	"гарант": {
+		"category": "concepts",
+		"slug": "garant",
+		"title": "Гарант"
+	},
+	"гиены-коллекторы": {
+		"category": "creatures",
+		"slug": "gieny-kollektory",
+		"title": "Гиены-Коллекторы"
+	},
+	"гильдия букмекеров": {
+		"category": "factions",
+		"slug": "gildiya-bukmekerov",
+		"title": "Гильдия Букмекеров"
+	},
+	"да захлебнётся он недоносом!": {
+		"category": "concepts",
+		"slug": "da-zahlebnyotsya-on-nedonosom",
+		"title": "Да захлебнётся он недоносом!"
+	},
+	"дезактивация удачи": {
+		"category": "concepts",
+		"slug": "dezaktivatsiya-udachi",
+		"title": "Дезактивация удачи"
+	},
+	"деп": {
+		"category": "concepts",
+		"slug": "dep",
+		"title": "Деп"
+	},
+	"деревья гаранта": {
+		"category": "concepts",
+		"slug": "derevya-garanta",
+		"title": "Деревья Гаранта"
+	},
+	"деривативное дно": {
+		"category": "concepts",
+		"slug": "derivativnoe-dno",
+		"title": "Деривативное дно"
+	},
+	"дикий загребут": {
+		"category": "creatures",
+		"slug": "dikiy-zagrebut",
+		"title": "Дикий Загребут"
+	},
+	"додепчёнки": {
+		"category": "creatures",
+		"slug": "dodepchyonki",
+		"title": "Додепчёнки"
+	},
+	"додепчёнок в штанах": {
+		"category": "concepts",
+		"slug": "dodepchyono-v-shtanah",
+		"title": "Додепчёнок в штанах"
+	},
+	"долговая яма": {
+		"category": "locations",
+		"slug": "dolgovaya-yama",
+		"title": "Долговая Яма"
+	},
+	"донат-алтыны": {
+		"category": "concepts",
+		"slug": "donat-altyny",
+		"title": "Донат-алтыны"
+	},
+	"донат-ханаты": {
+		"category": "factions",
+		"slug": "donat-hanaty",
+		"title": "Донат-Ханаты"
+	},
+	"занос": {
+		"category": "concepts",
+		"slug": "zanos",
+		"title": "Занос"
+	},
+	"зелёные глаза — либо трон, либо могила": {
+		"category": "concepts",
+		"slug": "zelyonye-glaza-lib",
+		"title": "Зелёные глаза — либо трон, либо могила"
 	},
 	"золотой спин": {
 		"category": "artifacts",
 		"slug": "zolotoy-spin",
 		"title": "Золотой Спин"
 	},
-	"скарабей вечного заноса": {
-		"category": "artifacts",
-		"slug": "skarabej-vechnogo-zanosa",
-		"title": "Скарабей Вечного Заноса"
+	"ибн-лентяй мудрый": {
+		"category": "characters",
+		"slug": "ibn-lentyay-mudryy",
+		"title": "Ибн-Лентяй Мудрый"
+	},
+	"иди ставь на ноль!": {
+		"category": "concepts",
+		"slug": "idi-stav-na-nol",
+		"title": "Иди ставь на ноль!"
+	},
+	"казич дэпич iii": {
+		"category": "characters",
+		"slug": "kazich-depich-iii",
+		"title": "Казич Дэпич III"
+	},
+	"кардинал заноса": {
+		"category": "characters",
+		"slug": "kardinal-zanosa",
+		"title": "Кардинал Заноса"
+	},
+	"каста крупье": {
+		"category": "factions",
+		"slug": "kasta-krupe",
+		"title": "Каста Крупье"
+	},
+	"квартал ломбардов": {
+		"category": "locations",
+		"slug": "kvartal-lombardov",
+		"title": "Квартал Ломбардов"
+	},
+	"кейс / лутбокс": {
+		"category": "concepts",
+		"slug": "keys-lutboks",
+		"title": "Кейс / Лутбокс"
+	},
+	"кеш-коины": {
+		"category": "concepts",
+		"slug": "kesh-koiny",
+		"title": "Кеш-коины"
+	},
+	"княжеский зал": {
+		"category": "locations",
+		"slug": "knyazheskiy-zal",
+		"title": "Княжеский Зал"
+	},
+	"коллектор тебя заберёт!": {
+		"category": "concepts",
+		"slug": "kollektor-tebya-zaberyot",
+		"title": "Коллектор тебя заберёт!"
+	},
+	"коллекторы": {
+		"category": "creatures",
+		"slug": "kollektory",
+		"title": "Коллекторы"
+	},
+	"косые слотики": {
+		"category": "locations",
+		"slug": "kosye-slotiki",
+		"title": "Косые Слотики"
+	},
+	"крипто-буны": {
+		"category": "concepts",
+		"slug": "kripto-buny",
+		"title": "Крипто-буны"
+	},
+	"леди фортуния занос": {
+		"category": "characters",
+		"slug": "ladi-fortuna-za-nos",
+		"title": "Леди Фортуния Занос"
+	},
+	"ледяная биржа шансов": {
+		"category": "concepts",
+		"slug": "ledyanaya-birzha-shansov",
+		"title": "Ледяная Биржа Шансов"
+	},
+	"ледяной каппер": {
+		"category": "concepts",
+		"slug": "ledyanoy-kapper",
+		"title": "Ледяной Каппер"
+	},
+	"ломбардия": {
+		"category": "factions",
+		"slug": "lombardiya",
+		"title": "Ломбардия"
+	},
+	"лорд волатильный": {
+		"category": "characters",
+		"slug": "lord-volatilnyy",
+		"title": "Лорд Волатильный"
+	},
+	"лудоман": {
+		"category": "concepts",
+		"slug": "ludoman",
+		"title": "Лудоман"
+	},
+	"людики": {
+		"category": "creatures",
+		"slug": "ludiki",
+		"title": "Людики"
+	},
+	"людомразия": {
+		"category": "factions",
+		"slug": "lyudomraziya",
+		"title": "Людомразия"
+	},
+	"маржа": {
+		"category": "concepts",
+		"slug": "marzha",
+		"title": "Маржа"
+	},
+	"мастер депа": {
+		"category": "characters",
+		"slug": "master-depa",
+		"title": "Мастер Депа"
+	},
+	"мать твою под барабаны!": {
+		"category": "concepts",
+		"slug": "mat-tvoyu-pod-barabany",
+		"title": "Мать твою под барабаны!"
+	},
+	"медвежий недонос": {
+		"category": "concepts",
+		"slug": "medvezhiy-nedonos",
+		"title": "Медвежий Недонос"
 	},
 	"меч-слот": {
 		"category": "artifacts",
 		"slug": "mech-slot",
 		"title": "Меч-Слот"
 	},
+	"множители": {
+		"category": "creatures",
+		"slug": "mnozhiteli",
+		"title": "Множители"
+	},
+	"моржий спин": {
+		"category": "concepts",
+		"slug": "morzhiy-spin",
+		"title": "Моржий Спин"
+	},
+	"недонос": {
+		"category": "concepts",
+		"slug": "nedonos",
+		"title": "Недонос"
+	},
+	"нормандия": {
+		"category": "factions",
+		"slug": "normandiya",
+		"title": "Нормандия"
+	},
+	"орден золотого спина": {
+		"category": "factions",
+		"slug": "orden-zolotogo-spina",
+		"title": "Орден Золотого Спина"
+	},
+	"орден математиков": {
+		"category": "factions",
+		"slug": "orden-matematikov",
+		"title": "Орден Математиков"
+	},
+	"печать долга": {
+		"category": "artifacts",
+		"slug": "pechat-dolga",
+		"title": "Печать Долга"
+	},
+	"подвал недоносов": {
+		"category": "locations",
+		"slug": "podval-nedonosov",
+		"title": "Подвал Недоносов"
+	},
+	"равнодоллары": {
+		"category": "concepts",
+		"slug": "ravnodollary",
+		"title": "Равнодоллары"
+	},
+	"рейкбек": {
+		"category": "concepts",
+		"slug": "reykbek",
+		"title": "Рейкбек"
+	},
+	"ретриггер": {
+		"category": "concepts",
+		"slug": "retrigger",
+		"title": "Ретриггер"
+	},
+	"священные трутни": {
+		"category": "creatures",
+		"slug": "svyashchennyye-trutni",
+		"title": "Священные Трутни"
+	},
+	"семь-семь-семь тебе в глотку!": {
+		"category": "concepts",
+		"slug": "sem-sem-sem-tebe-v-glotku",
+		"title": "Семь-семь-семь тебе в глотку!"
+	},
+	"сир кейлан": {
+		"category": "characters",
+		"slug": "sir-keylan",
+		"title": "Сир Кейлан"
+	},
+	"скарабей вечного заноса": {
+		"category": "artifacts",
+		"slug": "skarabej-vechnogo-zanosa",
+		"title": "Скарабей Вечного Заноса"
+	},
+	"слот-бороды": {
+		"category": "creatures",
+		"slug": "slot-borody",
+		"title": "Слот-Бороды"
+	},
+	"союз инкассаторов": {
+		"category": "factions",
+		"slug": "soyuz-inkassatorov",
+		"title": "Союз Инкассаторов"
+	},
+	"спин": {
+		"category": "concepts",
+		"slug": "spin",
+		"title": "Спин"
+	},
+	"стена баланса": {
+		"category": "locations",
+		"slug": "stena-balansa",
+		"title": "Стена Баланса"
+	},
+	"теневой совет": {
+		"category": "factions",
+		"slug": "tenevoy-sovet",
+		"title": "Теневой Совет"
+	},
+	"тепловой шум": {
+		"category": "concepts",
+		"slug": "teplovoy-shum",
+		"title": "Тепловой шум"
+	},
+	"тронный слот": {
+		"category": "artifacts",
+		"slug": "tronnyy-slot",
+		"title": "Тронный Слот"
+	},
+	"ты как тронный слот казича — замороженный!": {
+		"category": "concepts",
+		"slug": "ty-kak-tronnyy-slot-kazicha-zamorozhennyy",
+		"title": "Ты как Тронный Слот Казича — замороженный!"
+	},
+	"у него коллектор вместо сердца": {
+		"category": "concepts",
+		"slug": "u-nego-kollektor-vmesto-serdtsa",
+		"title": "У него Коллектор вместо сердца"
+	},
+	"флинкс": {
+		"category": "characters",
+		"slug": "flinks",
+		"title": "Флинкс"
+	},
+	"форт инкассация": {
+		"category": "locations",
+		"slug": "fort-inkassatsiya",
+		"title": "Форт Инкассация"
+	},
+	"фриспин мне в задницу!": {
+		"category": "concepts",
+		"slug": "frispin-mne-v-zadnitsu",
+		"title": "Фриспин мне в задницу!"
+	},
+	"фриспинчики": {
+		"category": "concepts",
+		"slug": "frispinchiki",
+		"title": "Фриспинчики"
+	},
+	"холодный расчёт": {
+		"category": "concepts",
+		"slug": "holodnyy-raschet",
+		"title": "Холодный расчёт"
+	},
+	"хребет волатильности": {
+		"category": "locations",
+		"slug": "hrebet-volatilnosti",
+		"title": "Хребет Волатильности"
+	},
+	"чёрный пул": {
+		"category": "concepts",
+		"slug": "chyornyy-pul",
+		"title": "Чёрный пул"
+	},
 	"betdragon": {
 		"category": "artifacts",
 		"slug": "betdragon",
 		"title": "BetDragon"
 	},
-	"bonuska": {
+	"fix / фиксированный исход": {
 		"category": "concepts",
-		"slug": "bonuska",
-		"title": "Бонускa"
+		"slug": "fix-fiksirovannyy-ishod",
+		"title": "FIX / Фиксированный исход"
 	},
-	"buny": {
-		"category": "concepts",
-		"slug": "buny",
-		"title": "Буны"
+	"fonbet": {
+		"category": "creatures",
+		"slug": "fonbet",
+		"title": "FonBet"
 	},
-	"bychiy-zanos": {
-		"category": "concepts",
-		"slug": "bychiy-zanos",
-		"title": "Бычий Занос"
-	},
-	"chyornyy-pul": {
-		"category": "concepts",
-		"slug": "chyornyy-pul",
-		"title": "Чёрный пул"
-	},
-	"derivativnoe-dno": {
-		"category": "concepts",
-		"slug": "derivativnoe-dno",
-		"title": "Деривативное дно"
-	},
-	"marzha": {
-		"category": "concepts",
-		"slug": "marzha",
-		"title": "Маржа"
-	},
-	"ledyanaya-birzha-shansov": {
-		"category": "concepts",
-		"slug": "ledyanaya-birzha-shansov",
-		"title": "Ледяная Биржа Шансов"
-	},
-	"holodnyy-raschet": {
-		"category": "concepts",
-		"slug": "holodnyy-raschet",
-		"title": "Холодный расчёт"
-	},
-	"teplovoy-shum": {
-		"category": "concepts",
-		"slug": "teplovoy-shum",
-		"title": "Тепловой шум"
-	},
-	"ledyanoy-kapper": {
-		"category": "concepts",
-		"slug": "ledyanoy-kapper",
-		"title": "Ледяной Каппер"
-	},
-	"morzhiy-spin": {
-		"category": "concepts",
-		"slug": "morzhiy-spin",
-		"title": "Моржий Спин"
-	},
-	"dezaktivatsiya-udachi": {
-		"category": "concepts",
-		"slug": "dezaktivatsiya-udachi",
-		"title": "Дезактивация удачи"
-	},
-	"frispin-mne-v-zadnitsu": {
-		"category": "concepts",
-		"slug": "frispin-mne-v-zadnitsu",
-		"title": "Фриспин мне в задницу!"
-	},
-	"da-zahlebnyotsya-on-nedonosom": {
-		"category": "concepts",
-		"slug": "da-zahlebnyotsya-on-nedonosom",
-		"title": "Да захлебнётся он недоносом!"
-	},
-	"kollektor-tebya-zaberyot": {
-		"category": "concepts",
-		"slug": "kollektor-tebya-zaberyot",
-		"title": "Коллектор тебя заберёт!"
-	},
-	"ty-kak-tronnyy-slot-kazicha-zamorozhennyy": {
-		"category": "concepts",
-		"slug": "ty-kak-tronnyy-slot-kazicha-zamorozhennyy",
-		"title": "Ты как Тронный Слот Казича — замороженный!"
-	},
-	"idi-stav-na-nol": {
-		"category": "concepts",
-		"slug": "idi-stav-na-nol",
-		"title": "Иди ставь на ноль!"
-	},
-	"mat-tvoyu-pod-barabany": {
-		"category": "concepts",
-		"slug": "mat-tvoyu-pod-barabany",
-		"title": "Мать твою под барабаны!"
-	},
-	"sem-sem-sem-tebe-v-glotku": {
-		"category": "concepts",
-		"slug": "sem-sem-sem-tebe-v-glotku",
-		"title": "Семь-семь-семь тебе в глотку!"
-	},
-	"vsyo-v-lombard": {
-		"category": "concepts",
-		"slug": "vsyo-v-lombard",
-		"title": "Всё в ломбард!"
-	},
-	"u-nego-kollektor-vmesto-serdtsa": {
-		"category": "concepts",
-		"slug": "u-nego-kollektor-vmesto-serdtsa",
-		"title": "У него Коллектор вместо сердца"
-	},
-	"dodepchyono-v-shtanah": {
-		"category": "concepts",
-		"slug": "dodepchyono-v-shtanah",
-		"title": "Додепчёнок в штанах"
-	},
-	"zelyonye-glaza-lib": {
-		"category": "concepts",
-		"slug": "zelyonye-glaza-lib",
-		"title": "Зелёные глаза — либо трон, либо могила"
+	"maxline": {
+		"category": "creatures",
+		"slug": "maxline",
+		"title": "MaxLine"
 	}
 }

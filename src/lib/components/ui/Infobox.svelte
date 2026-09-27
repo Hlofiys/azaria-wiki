@@ -49,26 +49,31 @@
 			<!-- Main Image -->
 			{#if entry.image}
 				<div class="image-container mb-3 md:mb-4">
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<img
-						src={entry.image}
-						alt={entry.title}
-						class="main-image w-full rounded-lg object-cover"
-						style="
-							max-height: 200px;
-							border: 2px solid {colors.border}60;
-							box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-						"
-						loading="lazy"
+					<button
+						type="button"
+						class="image-button w-full"
 						onclick={openImage}
-						onerror={(e) => {
-							// Hide image if it fails to load
-							const target = e.target as HTMLImageElement;
-							if (target && target.style) {
-								target.style.display = 'none';
-							}
-						}}
-					/>
+						aria-label="Открыть изображение в полном размере"
+					>
+						<img
+							src={entry.image}
+							alt={entry.title}
+							class="main-image w-full rounded-lg object-cover"
+							style="
+								max-height: 200px;
+								border: 2px solid {colors.border}60;
+								box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+							"
+							loading="lazy"
+							onerror={(e) => {
+								// Hide image if it fails to load
+								const target = e.target as HTMLImageElement;
+								if (target && target.style) {
+									target.style.display = 'none';
+								}
+							}}
+						/>
+					</button>
 				</div>
 			{/if}
 
@@ -264,6 +269,14 @@
 </div>
 
 <style>
+	.image-button {
+		display: block;
+		padding: 0;
+		border: none;
+		background: none;
+		cursor: zoom-in;
+	}
+
 	.main-image {
 		cursor: zoom-in;
 	}

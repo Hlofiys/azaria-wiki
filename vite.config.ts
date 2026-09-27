@@ -134,22 +134,17 @@ export default defineConfig({
 		// ESBuild options for aggressive optimization
 		target: 'es2020',
 
-		// Additional esbuild settings
-		esbuild: {
-			drop: ['console', 'debugger'],
-			minifyIdentifiers: true,
-			minifySyntax: true,
-			minifyWhitespace: true,
-			treeShaking: true,
-			legalComments: 'none'
-		},
-
 		// Source maps for production debugging
 		sourcemap: false,
 		// Enable CSS code splitting
 		cssCodeSplit: true,
 		// Optimize chunk size
 		chunkSizeWarningLimit: 1000
+	},
+
+	// Strip console/debugger from built bundles (esbuild transform options; `build.esbuild` was removed in Vite 7)
+	esbuild: {
+		drop: ['console', 'debugger']
 	},
 
 	// Optimize dependencies
@@ -165,7 +160,6 @@ export default defineConfig({
 		middlewareMode: false,
 		// Allow external hosts
 		host: true,
-		allowedHosts: ['work-1-mxkolbgchykermep.prod-runtime.all-hands.dev'],
 		// Optimize HMR
 		hmr: {
 			overlay: false

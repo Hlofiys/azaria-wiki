@@ -83,7 +83,7 @@ try {
 	const cacheKey = 'entity-map';
 
 	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
-		entityMap = serverCache.get(cacheKey);
+		entityMap = serverCache.get(cacheKey) as Record<string, EntityMapEntry>;
 	} else {
 		entityMap = JSON.parse(fs.readFileSync(entityMapPath, 'utf-8'));
 		serverCache.set(cacheKey, entityMap);
@@ -121,7 +121,7 @@ export function getAllEntries(category: CategoryType): EntryListItem[] {
 
 	// Check cache first
 	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
-		return serverCache.get(cacheKey);
+		return serverCache.get(cacheKey) as EntryListItem[];
 	}
 
 	const categoryDir = path.join(LORE_CONTENT_DIR, category);
@@ -207,7 +207,7 @@ export function getAllEntriesFlat(): EntryListItem[] {
 
 	// Check cache first
 	if (serverCache.has(cacheKey) && isValidCache(cacheKey)) {
-		return serverCache.get(cacheKey);
+		return serverCache.get(cacheKey) as EntryListItem[];
 	}
 
 	// Clear expired cache periodically
