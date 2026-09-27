@@ -184,8 +184,8 @@
 						style="color: rgba(243, 233, 210, 0.8);"
 					>
 						{#if isIOS}
-							Нажмите <Icon icon="mdi:export-variant" class="mx-1 inline h-4 w-4" /> в Safari, затем
-							"На экран «Домой»"
+							Нажмите <Icon icon="mdi:export-variant" class="mx-1 inline h-4 w-4" /> в Safari, затем "На
+							экран «Домой»"
 						{:else}
 							Установите приложение для быстрого доступа и работы в автономном режиме
 						{/if}

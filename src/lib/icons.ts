@@ -11,12 +11,7 @@ export interface CategoryColors {
 }
 
 export type CategoryType =
-	| 'characters'
-	| 'locations'
-	| 'factions'
-	| 'artifacts'
-	| 'concepts'
-	| 'creatures';
+	'characters' | 'locations' | 'factions' | 'artifacts' | 'concepts' | 'creatures';
 
 export type UIIconType =
 	| 'book'
