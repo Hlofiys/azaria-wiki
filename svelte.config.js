@@ -52,7 +52,13 @@ const config = {
 		paths: {
 			assets: '',
 			base: '',
-			relative: true
+			// Keep absolute asset URLs. `relative: true` mutates a global `paths.base`
+			// during rendering, which races with `prerender.concurrency` (async SSR):
+			// a page can compute its depth against another page's leaked base and emit
+			// `./_app/...` instead of `../_app/...`, which fails the prerender crawl
+			// with 404s (observed on Node 24). The site is served from the domain root,
+			// so absolute paths are correct here.
+			relative: false
 		}
 	},
 
