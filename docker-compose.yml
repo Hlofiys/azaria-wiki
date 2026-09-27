@@ -6,18 +6,17 @@ services:
     container_name: azaria-wiki
     restart: unless-stopped
 
-    # Port mapping
+    # Port mapping: nginx listens on port 80 inside the image
     ports:
-      - '8080:8080'
+      - '8080:80'
 
-    # Environment variables
     environment:
       - NODE_ENV=production
 
     # Health check
     healthcheck:
-      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8080/health']
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost/health']
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 10s

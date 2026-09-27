@@ -1,10 +1,9 @@
 # Azaria Wiki - Docker Makefile
-.PHONY: help build run dev stop clean test deploy logs health
+.PHONY: help dev dev-check build run deploy stop rm restart logs health smoke test test-image stats build-multi push pull scan audit clean clean-all prune shell inspect size up down ps ci-build version
 
 # Variables
 IMAGE_NAME = azaria-wiki
 CONTAINER_NAME = azaria-wiki
-DEV_CONTAINER_NAME = azaria-wiki-dev
 REGISTRY = ghcr.io
 REPO_NAME = $(shell basename `git rev-parse --show-toplevel`)
 TAG = latest
@@ -18,43 +17,31 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Development
-dev: ## Start development environment with hot reload
-	@echo "🚀 Starting development environment..."
-	docker-compose -f docker-compose.dev.yml up --build
+dev: ## Start the SvelteKit dev server (http://localhost:5173)
+	@echo "🚀 Starting dev server..."
+	npm run dev
 
-dev-build: ## Build development image
-	@echo "🔨 Building development image..."
-	docker build -f Dockerfile.dev -t $(IMAGE_NAME):dev .
-
-dev-run: ## Run development container
-	@echo "🏃 Running development container..."
-	docker run -d \
-		--name $(DEV_CONTAINER_NAME) \
-		-p $(DEV_PORT):$(DEV_PORT) \
-		-v $(PWD):/app \
-		-v /app/node_modules \
-		$(IMAGE_NAME):dev
-
-dev-stop: ## Stop development environment
-	@echo "🛑 Stopping development environment..."
-	docker-compose -f docker-compose.dev.yml down
+dev-check: ## Type-check and lint the project
+	@echo "🧪 Running svelte-check and lint..."
+	npm run check
+	npm run lint
 
 ##@ Production
 build: ## Build production image
 	@echo "🔨 Building production image..."
 	docker build -t $(IMAGE_NAME):$(TAG) .
 
-run: ## Run production container
+run: ## Run production container (host 8080 -> container :80)
 	@echo "🏃 Running production container..."
 	docker run -d \
 		--name $(CONTAINER_NAME) \
 		--restart unless-stopped \
-		-p $(PORT):8080 \
+		-p $(PORT):80 \
 		$(IMAGE_NAME):$(TAG)
 
-deploy: ## Deploy using docker-compose
-	@echo "🚀 Deploying with docker-compose..."
-	docker-compose up -d
+deploy: ## Deploy using docker compose
+	@echo "🚀 Deploying with docker compose..."
+	docker compose up -d
 
 ##@ Multi-platform
 build-multi: ## Build multi-platform image (amd64, arm64)
@@ -75,13 +62,13 @@ pull: ## Pull image from registry
 	docker pull $(REGISTRY)/$(REPO_NAME):$(TAG)
 
 ##@ Container Management
-stop: ## Stop running containers
-	@echo "🛑 Stopping containers..."
-	-docker stop $(CONTAINER_NAME) $(DEV_CONTAINER_NAME)
+stop: ## Stop running container
+	@echo "🛑 Stopping container..."
+	-docker stop $(CONTAINER_NAME)
 
-rm: stop ## Remove containers
-	@echo "🗑️  Removing containers..."
-	-docker rm $(CONTAINER_NAME) $(DEV_CONTAINER_NAME)
+rm: stop ## Remove container
+	@echo "🗑️  Removing container..."
+	-docker rm $(CONTAINER_NAME)
 
 restart: stop run ## Restart production container
 
@@ -90,11 +77,7 @@ logs: ## Show container logs
 	@echo "📋 Showing container logs..."
 	docker logs -f $(CONTAINER_NAME)
 
-logs-dev: ## Show development container logs
-	@echo "📋 Showing development container logs..."
-	docker logs -f $(DEV_CONTAINER_NAME)
-
-health: ## Check container health
+health: ## Check container health (host port $(PORT))
 	@echo "🏥 Checking container health..."
 	@curl -f http://localhost:$(PORT)/health && echo "✅ Container is healthy" || echo "❌ Container is unhealthy"
 
@@ -103,19 +86,15 @@ stats: ## Show container resource usage
 	docker stats --no-stream $(CONTAINER_NAME)
 
 ##@ Testing
-test: ## Run container tests
-	@echo "🧪 Running container tests..."
-	@./scripts/test-container.sh
+smoke: ## Run smoke tests against the built image
+	@echo "🧪 Running smoke tests..."
+	bash scripts/smoke-test.sh $(IMAGE_NAME):$(TAG)
 
-test-image: build ## Build and test image
-	@echo "🧪 Testing built image..."
-	@docker run --rm --name $(CONTAINER_NAME)-test \
-		-p 8081:8080 \
-		-d $(IMAGE_NAME):$(TAG)
-	@sleep 10
-	@curl -f http://localhost:8081/health || (docker stop $(CONTAINER_NAME)-test && exit 1)
-	@echo "✅ Image test passed"
-	@docker stop $(CONTAINER_NAME)-test
+test: smoke ## Alias for `make smoke`
+
+test-image: build ## Build and smoke-test the image
+	@echo "🧪 Building and smoke-testing image..."
+	bash scripts/smoke-test.sh $(IMAGE_NAME):$(TAG)
 
 ##@ Security
 scan: ## Scan image for vulnerabilities
@@ -130,11 +109,11 @@ audit: ## Security audit of the container
 		aquasec/trivy:latest fs /src
 
 ##@ Cleanup
-clean: ## Clean up containers and images
+clean: ## Clean up container and image
 	@echo "🧹 Cleaning up..."
-	-docker stop $(CONTAINER_NAME) $(DEV_CONTAINER_NAME)
-	-docker rm $(CONTAINER_NAME) $(DEV_CONTAINER_NAME)
-	-docker rmi $(IMAGE_NAME):$(TAG) $(IMAGE_NAME):dev
+	-docker stop $(CONTAINER_NAME)
+	-docker rm $(CONTAINER_NAME)
+	-docker rmi $(IMAGE_NAME):$(TAG)
 
 clean-all: ## Clean up everything (containers, images, volumes)
 	@echo "🧹 Deep cleaning..."
@@ -150,10 +129,6 @@ shell: ## Open shell in running container
 	@echo "🐚 Opening shell in container..."
 	docker exec -it $(CONTAINER_NAME) /bin/sh
 
-shell-dev: ## Open shell in development container
-	@echo "🐚 Opening shell in development container..."
-	docker exec -it $(DEV_CONTAINER_NAME) /bin/sh
-
 inspect: ## Inspect container configuration
 	@echo "🔍 Inspecting container..."
 	docker inspect $(CONTAINER_NAME)
@@ -163,17 +138,17 @@ size: ## Show image size
 	docker images $(IMAGE_NAME):$(TAG) --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
 
 ##@ Docker Compose
-up: ## Start all services with docker-compose
-	@echo "🚀 Starting services with docker-compose..."
-	docker-compose up -d
+up: ## Start all services with docker compose
+	@echo "🚀 Starting services with docker compose..."
+	docker compose up -d
 
-down: ## Stop all services with docker-compose
-	@echo "🛑 Stopping services with docker-compose..."
-	docker-compose down
+down: ## Stop all services with docker compose
+	@echo "🛑 Stopping services with docker compose..."
+	docker compose down
 
 ps: ## Show running services
 	@echo "📋 Running services:"
-	docker-compose ps
+	docker compose ps
 
 ##@ CI/CD
 ci-build: ## Build for CI/CD pipeline
