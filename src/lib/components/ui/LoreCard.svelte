@@ -32,15 +32,15 @@
 	<a
 		{href}
 		data-seal={entry.category}
-		class="seal group grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 border-b border-line px-3 py-3 transition-colors hover:bg-ink-700/40 lg:grid-cols-[5.5rem_minmax(0,1fr)_13rem_13rem_1.25rem]"
+		class="seal group grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 border-b border-line px-3 py-3 transition-colors hover:bg-ink-700/40 @4xl:grid-cols-[5.5rem_minmax(0,1fr)_13rem_13rem_1.25rem]"
 	>
-		<span class="folio hidden lg:block">{folio}</span>
+		<span class="folio hidden @4xl:block">{folio}</span>
 		<span
 			class="font-display text-[1.0625rem] leading-snug text-parchment group-hover:text-brass-bright"
 			>{entry.title}</span
 		>
-		<span class="text-sm text-parchment-dim lg:text-[0.8125rem]">{secondary}</span>
-		<span class="col-span-2 flex flex-wrap gap-1.5 lg:col-span-1">
+		<span class="text-sm text-parchment-dim @4xl:text-[0.8125rem]">{secondary}</span>
+		<span class="col-span-2 flex flex-wrap gap-1.5 @4xl:col-span-1">
 			{#each tags.slice(0, 2) as tag (tag)}
 				<Tag label={tag} />
 			{/each}
@@ -51,7 +51,7 @@
 		<Icon
 			icon={getUIIcon('arrow-right')}
 			width="14"
-			class="hidden self-center text-brass-deep transition-transform group-hover:translate-x-0.5 group-hover:text-brass lg:block"
+			class="hidden self-center text-brass-deep transition-transform group-hover:translate-x-0.5 group-hover:text-brass @4xl:block"
 		/>
 	</a>
 {:else}

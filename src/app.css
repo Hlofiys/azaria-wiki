@@ -903,6 +903,47 @@
 		height: 1px;
 		background: linear-gradient(90deg, transparent, var(--color-brass), transparent);
 	}
+
+	/* --- Header icon motion ------------------------------------------------ */
+	/* Icons answer to hover and click: hue shift, glow and a small pop. */
+	.nav-link svg,
+	.nav-link-mobile svg,
+	.brand-mark svg,
+	.icon-btn svg {
+		transition:
+			color 0.18s ease,
+			transform 0.18s ease,
+			filter 0.18s ease;
+	}
+
+	.nav-link:hover svg,
+	.nav-link:focus-visible svg,
+	.nav-link-mobile:hover svg,
+	.nav-link-mobile:focus-visible svg,
+	.brand-mark:hover svg,
+	.brand-mark:focus-visible svg,
+	.icon-btn:hover svg,
+	.icon-btn:focus-visible svg {
+		color: color-mix(in oklab, var(--seal, var(--color-brass)) 58%, var(--color-parchment));
+		transform: scale(1.15);
+		filter: drop-shadow(
+			0 0 6px color-mix(in oklab, var(--seal, var(--color-brass)) 55%, transparent)
+		);
+	}
+
+	.nav-link:active svg,
+	.nav-link-mobile:active svg,
+	.brand-mark:active svg,
+	.icon-btn:active svg {
+		transform: scale(0.86);
+		transition-duration: 0.07s;
+	}
+
+	.nav-link--active svg {
+		filter: drop-shadow(
+			0 0 5px color-mix(in oklab, var(--seal, var(--color-brass)) 45%, transparent)
+		);
+	}
 }
 
 /* ==========================================================================

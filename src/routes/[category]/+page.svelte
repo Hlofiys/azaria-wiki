@@ -206,9 +206,9 @@
 					{/each}
 				</div>
 			{:else}
-				<div class="frame frame--quiet">
+				<div class="frame frame--quiet @container">
 					<div
-						class="relative z-10 hidden grid-cols-[5.5rem_minmax(0,1fr)_13rem_13rem_1.25rem] gap-x-4 border-b border-line px-3 py-2 lg:grid"
+						class="relative z-10 hidden grid-cols-[5.5rem_minmax(0,1fr)_13rem_13rem_1.25rem] gap-x-4 border-b border-line px-3 py-2 @4xl:grid"
 					>
 						<span class="eyebrow">Лист</span>
 						<span class="eyebrow">Название</span>

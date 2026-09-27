@@ -16,8 +16,8 @@
 		reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	});
 
-	function scrollToSections() {
-		document.getElementById('sections')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	function scrollToSlotMachine() {
+		document.getElementById('slot-machine')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	}
 </script>
 
@@ -42,7 +42,7 @@
 				долг — валюта, а деп становится искусством.
 			</p>
 			<div class="mt-7 flex flex-wrap items-center gap-3">
-				<button type="button" class="btn btn--solid" onclick={scrollToSections}>
+				<button type="button" class="btn btn--solid" onclick={scrollToSlotMachine}>
 					<Icon icon={getUIIcon('slot')} width="15" />
 					Испытать судьбу
 				</button>
@@ -137,7 +137,7 @@
 	<section class="grid gap-10 lg:grid-cols-2 lg:gap-8">
 		<div>
 			<SectionHeading eyebrow="Поступления" title="Свежие записи" />
-			<div class="mt-4 border-t border-line">
+			<div class="@container mt-4 border-t border-line">
 				{#each data.recentEntries as entry (entry.slug)}
 					<LoreCard {entry} variant="ledger" showCategory />
 				{/each}
@@ -145,7 +145,7 @@
 		</div>
 		<div>
 			<SectionHeading eyebrow="Наибольшее число ссылок" title="Самые цитируемые" />
-			<div class="mt-4 border-t border-line">
+			<div class="@container mt-4 border-t border-line">
 				{#each data.topCited as entry (entry.slug)}
 					<div class="flex items-baseline gap-3">
 						<div class="min-w-0 flex-1">

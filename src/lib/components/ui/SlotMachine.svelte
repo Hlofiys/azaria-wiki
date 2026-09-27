@@ -88,7 +88,7 @@
 	}
 </script>
 
-<div class="frame seal">
+<div id="slot-machine" class="frame seal scroll-mt-24">
 	<div class="relative z-10 p-5 sm:p-7">
 		<div class="flex flex-wrap items-end justify-between gap-3">
 			<div>

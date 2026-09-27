@@ -79,7 +79,11 @@
 	<div class="mx-auto max-w-7xl px-4">
 		<div class="flex h-[68px] items-center gap-3">
 			<!-- Wordmark -->
-			<a href={resolve('/')} class="flex items-center gap-3" aria-label="Азария — на главную">
+			<a
+				href={resolve('/')}
+				class="brand-mark flex items-center gap-3"
+				aria-label="Азария — на главную"
+			>
 				<span
 					class="grid size-[34px] rotate-45 place-items-center border border-line-strong bg-ink-800"
 				>
@@ -238,7 +242,7 @@
 						{@const isActive = $page.url.pathname.startsWith(`/${category}`)}
 						<a
 							href={resolve(`/${category}` as `/${string}`)}
-							class="flex items-center gap-3 border-b border-line px-2 py-3 text-parchment-dim hover:text-brass-bright"
+							class="nav-link-mobile flex items-center gap-3 border-b border-line px-2 py-3 text-parchment-dim hover:text-brass-bright"
 							class:text-brass-bright={isActive}
 							data-seal={category}
 							aria-current={isActive ? 'page' : undefined}
