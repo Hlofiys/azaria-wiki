@@ -59,6 +59,11 @@
 		"slug": "gildiya-bukmekerov",
 		"title": "Гильдия Букмекеров"
 	},
+	"город-призрак «зеро»": {
+		"category": "locations",
+		"slug": "gorod-prizrak-zero",
+		"title": "Город-призрак «Зеро»"
+	},
 	"да захлебнётся он недоносом!": {
 		"category": "concepts",
 		"slug": "da-zahlebnyotsya-on-nedonosom",
@@ -73,6 +78,11 @@
 		"category": "concepts",
 		"slug": "dep",
 		"title": "Деп"
+	},
+	"депдорадо (золотой город)": {
+		"category": "locations",
+		"slug": "depdorado",
+		"title": "Депдорадо (Золотой город)"
 	},
 	"деревья гаранта": {
 		"category": "concepts",
@@ -139,6 +149,11 @@
 		"slug": "idi-stav-na-nol",
 		"title": "Иди ставь на ноль!"
 	},
+	"империя азино": {
+		"category": "factions",
+		"slug": "imperiya-azino",
+		"title": "Империя Азино"
+	},
 	"казич дэпич iii": {
 		"category": "characters",
 		"slug": "kazich-depich-iii",
@@ -194,6 +209,11 @@
 		"slug": "kripto-buny",
 		"title": "Крипто-буны"
 	},
+	"курган луза": {
+		"category": "locations",
+		"slug": "kurgan-luza",
+		"title": "Курган Луза"
+	},
 	"леди фортуния занос": {
 		"category": "characters",
 		"slug": "ladi-fortuna-za-nos",
@@ -208,6 +228,16 @@
 		"category": "concepts",
 		"slug": "ledyanoy-kapper",
 		"title": "Ледяной Каппер"
+	},
+	"лес дикого депа": {
+		"category": "locations",
+		"slug": "les-dikogo-depa",
+		"title": "Лес Дикого Депа"
+	},
+	"логово betdragon'а": {
+		"category": "locations",
+		"slug": "logovo-betdragona",
+		"title": "Логово BetDragon'а"
 	},
 	"ломбардия": {
 		"category": "factions",
@@ -269,6 +299,11 @@
 		"slug": "morzhiy-spin",
 		"title": "Моржий Спин"
 	},
+	"народ тотема-экспресса": {
+		"category": "factions",
+		"slug": "narod-totema-ekspressa",
+		"title": "Народ Тотема-Экспресса"
+	},
 	"недонос": {
 		"category": "concepts",
 		"slug": "nedonos",
@@ -304,6 +339,11 @@
 		"slug": "ravnodollary",
 		"title": "Равнодоллары"
 	},
+	"разлом недоноса": {
+		"category": "locations",
+		"slug": "razlom-nedonosa",
+		"title": "Разлом Недоноса"
+	},
 	"рейкбек": {
 		"category": "concepts",
 		"slug": "reykbek",
@@ -324,10 +364,10 @@
 		"slug": "sem-sem-sem-tebe-v-glotku",
 		"title": "Семь-семь-семь тебе в глотку!"
 	},
-	"сир кейлан": {
+	"сир кэйлан": {
 		"category": "characters",
 		"slug": "sir-keylan",
-		"title": "Сир Кейлан"
+		"title": "Сир Кэйлан"
 	},
 	"скарабей вечного заноса": {
 		"category": "artifacts",
@@ -398,6 +438,11 @@
 		"category": "concepts",
 		"slug": "frispinchiki",
 		"title": "Фриспинчики"
+	},
+	"халифат трутня": {
+		"category": "factions",
+		"slug": "halifat-trutnya",
+		"title": "Халифат Трутня"
 	},
 	"холодный расчёт": {
 		"category": "concepts",
