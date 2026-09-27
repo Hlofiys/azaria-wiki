@@ -277,10 +277,13 @@ export async function getBacklinks(category: CategoryType, slug: string): Promis
 	if (!targetEntry) return [];
 
 	const backlinks: EntryListItem[] = [];
+	const title = targetEntry.metadata.title || '';
+	const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const linkRe = new RegExp(`\\[\\[\\s*${escaped}\\s*(\\|[^\\]]*)?\\]\\]`, 'i');
 
 	for (const entry of allEntries) {
 		const fullEntry = await getEntry(entry.category, entry.slug);
-		if (fullEntry && fullEntry.content.includes(`[[${targetEntry.metadata.title || ''}]]`)) {
+		if (fullEntry && linkRe.test(fullEntry.content)) {
 			backlinks.push(entry);
 		}
 	}
@@ -335,15 +338,18 @@ function parseFrontmatter(content: string): FrontmatterResult {
 function processWikiLinks(content: string): string {
 	const wikiLinkRegex = /\[\[([^\]]+)\]\]/g;
 
-	return content.replace(wikiLinkRegex, (match, linkText: string) => {
-		const entityInfo = entityMap[linkText.toLowerCase()];
+	return content.replace(wikiLinkRegex, (match, inner: string) => {
+		const [targetRaw, displayRaw] = inner.split('|');
+		const target = targetRaw.trim();
+		const display = (displayRaw ?? targetRaw).trim();
+		const entityInfo = entityMap[target.toLowerCase()];
 
 		if (entityInfo) {
-			return `<a href="/${entityInfo.category}/${entityInfo.slug}" class="wiki-link" title="${entityInfo.title}">${linkText}</a>`;
+			return `<a href="/${entityInfo.category}/${entityInfo.slug}" class="wiki-link" title="${entityInfo.title}">${display}</a>`;
 		}
 
 		// If no match found, return the original text but styled as a missing link
-		return `<span class="wiki-link-missing" title="Article not found: ${linkText}">${linkText}</span>`;
+		return `<span class="wiki-link-missing" title="Article not found: ${target}">${display}</span>`;
 	});
 }
 
