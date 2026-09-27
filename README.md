@@ -56,4 +56,5 @@ GitHub Actions:
 
 - **nginx:** `$uri.html` проверяется раньше `$uri/` — иначе прямые ссылки на статьи отдают 301→403 (каталоги `__data.json` из adapter-static). Не меняйте порядок; smoke-тесты это стерегут.
 - Заголовки безопасности продублированы в локациях через `include security-headers.conf` — правило наследования `add_header` в nginx: локация со своими `add_header` теряет унаследованные.
-- Админка `/admin` (Decap CMS) без авторизации нерабочая — статьи правятся через git.
+- **Админка:** `/admin/` — Sveltia CMS. Вход по кнопке «Sign In with Token»: нужен fine-grained GitHub-токен с правом `Contents: Read and write` на этот репозиторий (OAuth-шлюз не настроен — в `config.yml` включён только `auth_methods: [token]`). Токен хранится в localStorage браузера. Загрузки — в `static/images/uploads`.
+- **Заголовки админки** — отдельный `security-headers-admin.conf` (CSP шире: unpkg.com, api.github.com, githubstatus, jsdelivr, blob:). Локация `/admin/` — `^~`, чтобы regex-локации ассетов её не перехватывали.
