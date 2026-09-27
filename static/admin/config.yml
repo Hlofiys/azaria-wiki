@@ -1,6 +1,11 @@
+# Конфигурация Sveltia CMS (совместима с Decap CMS).
+# Вход: personal access token GitHub (Contents: Read and write).
 backend:
-  name: git-gateway
+  name: github
+  repo: Hlofiys/azaria-wiki
   branch: main
+  # Вход только по токену: OAuth-шлюз не настроен (см. кнопку «Sign In with Token»)
+  auth_methods: [token]
 
 media_folder: "static/images/uploads"
 public_folder: "/images/uploads"

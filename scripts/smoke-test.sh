@@ -74,6 +74,22 @@ hdr / "x-frame-options" "X-Frame-Options"
 hdr / "x-content-type-options" "X-Content-Type-Options"
 hdr /sw.js "cache-control: no-cache" "sw.js не кэшируется надолго"
 
+echo "▶ Админка (Sveltia CMS)"
+check /admin 301 "редирект на /admin/"
+if curl -sI "http://localhost:${PORT}/admin" | tr -d '\r' | grep -qi '^location: /admin/$'; then
+	echo "  ✓ редирект относительный (/admin/) — не зависит от порта и схемы"
+else
+	echo "  ✗ Location редиректа должен быть относительным: /admin/"
+	fail=1
+fi
+check /admin/ 200 "CMS отдаётся"
+if curl -sI "http://localhost:${PORT}/admin/" | grep -i '^content-security-policy' | grep -q 'unpkg.com'; then
+	echo "  ✓ CSP админки разрешает unpkg.com (Sveltia)"
+else
+	echo "  ✗ CSP админки не разрешает unpkg.com"
+	fail=1
+fi
+
 echo "▶ Пре-сжатие"
 if curl -s -H 'Accept-Encoding: gzip' -D - -o /dev/null "http://localhost:${PORT}/" | grep -qi 'content-encoding: gzip'; then
 	echo "  ✓ precompressed .gz отдаётся"
